@@ -42,7 +42,9 @@ function SaveData(){
         })   
     }
 }
-
+bot.on('ready', () => {
+    console.log("Ready to go!");
+})
 bot.on('messageUpdate', message =>{
     SaveData();
  })
