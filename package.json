@@ -5,9 +5,13 @@
   "main": "index.js",
   "start": "index.js",
   "scripts": {
-	"start":"node index.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Gerudum",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "discord": "^0.8.2",
+    "node": "^12.4.0"
+  }
 }
