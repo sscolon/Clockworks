@@ -1,1 +1,23 @@
-{}
+{"AEROTECH PRIZE BOX":{
+    "name":"AeroTech Prize Box",
+    "usage":" is being unboxed by ",
+    "table":"AEROTECH",
+    "type":"Usable",
+    "effect":"Prize"
+},"TECH BLUE AERO HELM":{
+    "name":"Tech Blue Aero Helm"
+},"TECH ORANGE AERO HELM":{
+    "name":"Tech Orange Aero Helm"
+},"TECH PINK AERO HELM":{
+    "name":"Tech Pink Aero Helm"
+},"TECH GREEN AERO HELM":{
+    "name":"Tech Green Aero Helm"
+},"TECH BLUE AERO ARMOR":{
+    "name":"Tech Blue Aero Armor"
+},"TECH ORANGE AERO ARMOR":{
+    "name":"Tech Orange Aero Armor"
+},"TECH PINK AERO ARMOR":{
+    "name":"Tech Pink Aero Armor"
+},"TECH GREEN AERO ARMOR":{
+    "name":"Tech Green Aero Armor"
+}}
