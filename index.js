@@ -18,6 +18,7 @@ const fs = require('fs');
 
 let server = JSON.parse(fs.readFileSync('.data/server.json','utf8')); //Server Information
 let user = JSON.parse(fs.readFileSync('.data/user.json','utf8')); // Player Stats
+let items = JSON.parse(fs.readFileSync('config/items.json','utf8'));
 
 function Validate(json){
     try {
