@@ -83,21 +83,21 @@ function AddItem(player,item,amount = 1){
 }
 
 const arrSum = arr => arr.reduce((a,b) => a + b, 0)
-function CreateLoot(table){
+function CreateLoot(myTable){
     var top = 0;
     var total = 0;
 
     //For each item entry, get the weight
-    for(var key in table){
-        total += table[key].weight;
+    for(var key in myTable){
+        total += myTable[key].weight;
     }
-
+    console.log(total);
     //Generate random number
     var rand = Math.floor(Math.random() * total);
 
     //Get Prize
-    for(var key in table){
-        total += table[key].weight; 
+    for(var key in myTable){
+        top += myTable[key].weight; 
         
         if(rand <= top){ 
             return key;                         
@@ -122,7 +122,7 @@ function Use(player,item){
     } else {
         switch(items[item].effect){
             case "Prize":
-                var prize = CreateLoot(table[item]);
+                var prize = CreateLoot(table[items[item].table]);
                 AddItem(player,prize,1);
                 embed.addField(items[item].name + items[item].usage + user[player].name, "They have obtained a " + prize + " Congratulations!");
                 embed.setThumbnail(items[prize].icon);
