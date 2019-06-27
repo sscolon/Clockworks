@@ -134,7 +134,7 @@ bot.on('message', message=> {
         user[player].inventory = {};
     }
 
-    user[player].channel = message.author.channel.id;
+    user[player].channel = message.channel.id;
 
     let gm = message.guild.roles.find(x => x.name === "GameMaster");
     var powerful = message.member.roles.has(gm);
