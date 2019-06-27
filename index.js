@@ -54,7 +54,7 @@ function SaveData(){
 }
 function Game(){
     if(!server.timer){
-        server.timer = 60;
+        server.timer = 1200;
     }
     server.timer -= 1;
     console.log(server.timer); 
