@@ -163,6 +163,9 @@ bot.on('message', message=> {
                 for(var key in user[player].inventory){
                     myItems.push(user[player].inventory[key].name + " Amount: " + user[player].inventory[key].amount);
                 }
+                if(myItems.length < 1){
+                    myItems.push("Nothing");
+                }
                 embed.addField("Items",myItems);
                 embed.setThumbnail(message.author.avatarURL);
                 message.channel.send(embed);
