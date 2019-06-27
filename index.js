@@ -122,7 +122,7 @@ function Use(player,item){
     } else {
         switch(items[item].effect){
             case "Prize":
-                var prize = CreateLoot(table[items[item].table]);
+                var prize = CreateLoot(table[item]);
                 AddItem(player,prize,1);
                 embed.addField(items[item].name + items[item].usage + user[player].name, "They have obtained a " + prize + " Congratulations!");
                 embed.setThumbnail(items[prize].icon);
