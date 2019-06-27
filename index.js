@@ -100,7 +100,7 @@ function Use(player,item){
     var channel = bot.channels.get(user[player].channel);
     try {
         items[item].usage;
-    } catch {
+    } catch(e) {
         channel.send("Not a usable");
         return;
     }
