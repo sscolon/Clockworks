@@ -19,7 +19,7 @@ const fs = require('fs');
 let server = JSON.parse(fs.readFileSync('.data/server.json','utf8')); //Server Information
 let user = JSON.parse(fs.readFileSync('.data/user.json','utf8')); // Player Stats
 let items = JSON.parse(fs.readFileSync('config/items.json','utf8')); //Items
-let table = JSON.parse(fs.readFileSync('.data/spawn_table.json','utf8')); //Table
+let table = JSON.parse(fs.readFileSync('config/spawn_table.json','utf8')); //Table
 
 function Update(){
     Game();
@@ -42,11 +42,6 @@ function SaveData(){
     } 
     if(Validate(server)){
         fs.writeFile('.data/server.json', JSON.stringify(server,null,4), (err) =>{
-            if (err) console.error(err);
-        })   
-    }
-    if(Validate(table)){
-        fs.writeFile('.data/spawn_table.json', JSON.stringify(table,null,4), (err) =>{
             if (err) console.error(err);
         })   
     }
