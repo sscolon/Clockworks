@@ -61,7 +61,7 @@ function Game(){
     if(server.timer <= 0){
         //DO SOMETHING
         for(var key in user){
-            AddItem(key,"Tech Aero Prize Box",1);
+            AddItem(key,"TECH AERO PRIZE BOX",1);
             console.log("Items Given out.");
         }
         server.timer = 60;
@@ -70,6 +70,7 @@ function Game(){
 }
 function AddItem(player,item,amount = 1){
     if(amount < 0 || !items[item]){
+        console.log("Failure: Attempted to give: " + item + " Amount attempted to give: " + amount)
         return;
     }
     if(!user[player].inventory[item]){
