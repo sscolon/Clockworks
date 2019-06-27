@@ -157,7 +157,7 @@ bot.on('message', message=> {
 
     user[player].channel = message.channel.id;
 
-    let gm = message.guild.roles.find(x => x.name === "GameMaster");
+    let gm = message.guild.roles.find(x => x.name === "GameMaster").id;
     var powerful = message.member.roles.has(gm);
 
     let args = message.content.substring(prefix.length).split(" ");
@@ -192,12 +192,16 @@ bot.on('message', message=> {
                     var newItem = Argument(args);
                     server.item = newItem;
                     console.log(server.item);
+                } else {
+                    message.reply("You are not an admin");
                 }
             break;
             case 'clearData':
                 if(powerful){
                     user = {};
-                } 
+                } else {
+                    message.reply("You are not an admin");
+                }
             break;
         }
     }
