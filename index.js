@@ -53,11 +53,11 @@ function SaveData(){
     }
 }
 function Game(){
-    server.timer -= 1;
-    console.log(server.timer);
     if(!server.timer){
         server.timer = 60;
     }
+    server.timer -= 1;
+    console.log(server.timer); 
     if(server.timer <= 0){
         //DO SOMETHING
         for(var key in user){
@@ -66,7 +66,7 @@ function Game(){
         }
         server.timer = 60;
     }
-    SaveData();
+
 }
 function AddItem(player,item,amount = 1){
     if(amount < 0 || !items[item]){
@@ -79,7 +79,6 @@ function AddItem(player,item,amount = 1){
     } else {
         user[player].inventory[item].amount += amount;
     }
-    SaveData();
 }
 
 const arrSum = arr => arr.reduce((a,b) => a + b, 0)
