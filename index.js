@@ -171,7 +171,7 @@ bot.on('message', message=> {
             break;
             case 'use':
                 var object = Argument(args);
-                Use(player,object);
+                Use(player,object.toUpperCase());
             break;
             case 'inventory':
                 const embed = new Discord.RichEmbed();
