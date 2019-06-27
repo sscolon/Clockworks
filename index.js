@@ -159,6 +159,9 @@ bot.on('messageUpdate', message =>{
     SaveData();
  })
 bot.on('message', message=> { 
+    if(message.channel.type === "dm"){
+        return;
+    } 
     var player = message.author.id;
     
     ValidatePlayer(player);
