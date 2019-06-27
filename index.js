@@ -21,6 +21,12 @@ let user = JSON.parse(fs.readFileSync('.data/user.json','utf8')); // Player Stat
 let items = JSON.parse(fs.readFileSync('config/items.json','utf8')); //Items
 let table = JSON.parse(fs.readFileSync('config/spawn_table.json','utf8')); //Table
 
+
+setInterval(function() {
+    Update();
+    
+}, 1000);
+//Update is ran every second.
 function Update(){
     Game();
 }
