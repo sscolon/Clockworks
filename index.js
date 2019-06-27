@@ -120,7 +120,7 @@ function Use(player,item){
                 var prize = CreateLoot(table[items[item].table]);
                 AddItem(player,prize,1);
                 embed.addField(items[item].name + items[item].usage + user[player].name, "They have obtained a " + prize + " Congratulations!");
-                embed.setThumbnail(items[item].icon);
+                embed.setThumbnail(items[prize].icon);
             break;
         }
     } 
