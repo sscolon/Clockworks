@@ -134,6 +134,16 @@ function ValidatePlayer(player){
         user[player].inventory = {};
     }
 }
+function Argument(args){
+    var object = "";
+    for(var i = 1; i < args.length; i++){
+        object += args[i];
+        if(args[i + 1]){
+            object += " ";
+        }
+    }
+    return object;
+}
 bot.on('ready', () => {
     console.log("Ready to go!");
 })
@@ -160,13 +170,7 @@ bot.on('message', message=> {
                 message.reply("Hello World!");
             break;
             case 'use':
-                var object = "";
-                for(var i = 1; i < args.length; i++){
-                    object += args[i];
-                    if(args[i + 1]){
-                        object += " ";
-                    }
-                }
+                var object = Argument(args);
                 Use(player,object);
             break;
             case 'inventory':
@@ -185,7 +189,7 @@ bot.on('message', message=> {
             break;
             case 'setitem':
                 if(powerful){
-                    var newItem = args.splice(args[0]);
+                    var newItem = Argument(args);
                     server.item = newItem;
                     console.log(server.item);
                 }
