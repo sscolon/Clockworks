@@ -61,7 +61,9 @@ function Game(){
         //DO SOMETHING
         for(var key in user){
             AddItem(key,"Tech Aero Prize Box",1);
+            console.log("Items Given out.");
         }
+        server.timer = 60;
     }
 }
 function AddItem(player,item,amount = 1){
@@ -118,7 +120,17 @@ function Use(player,item){
 
     channel.send(embed);
 }
-
+function ValidatePlayer(player){
+    if(!user[player]){
+        user[player] = {};    
+    }
+    if(!user[player].name){
+        user[player].name = message.author.username;
+    }
+    if(!user[player].inventory){
+        user[player].inventory = {};
+    }
+}
 bot.on('ready', () => {
     console.log("Ready to go!");
 })
@@ -128,11 +140,7 @@ bot.on('messageUpdate', message =>{
 bot.on('message', message=> { 
     var player = message.author.id;
     
-    if(!user[player]){
-        user[player] = {};
-        user[player].name = message.author.username;
-        user[player].inventory = {};
-    }
+    ValidatePlayer(player);
 
     user[player].channel = message.channel.id;
 
