@@ -54,7 +54,7 @@ function SaveData(){
 }
 function Game(){
     if(!server.timer){
-        server.timer = 1200;
+        server.timer = 12000;
     }
     server.timer -= 1;
   //  console.log(server.timer); 
@@ -64,7 +64,7 @@ function Game(){
             AddItem(key,server.item,1);
             console.log("Items Given out.");
         }
-        server.timer = 60;
+        server.timer = 12000;
     }
 
 }
