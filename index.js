@@ -106,29 +106,31 @@ function Use(player,item){
     try {
         items[item].usage;
     } catch(e) {
-        channel.send("Not a usable");
+        console.log(item + " is not a usable");
         return;
     }
-
     const embed = new Discord.RichEmbed();
     embed.setTitle(user[player].name + " is using " + items[item].name)
 
-    switch(items[item].effect){
-        case "Prize":
-            var prize = CreateLoot(table[items[item].table]);
-            AddItem(player,prize,1);
-            embed.addField(items[item].name + items[item].usage + user[player].name, "They have obtained a " + prize + " Congratulations!");
-        break;
-    }
+    if(user[player].inventory[item].amount < 1){
+        embed.addField("You don't have that item","Sorry");
+    } else {
+        switch(items[item].effect){
+            case "Prize":
+                var prize = CreateLoot(table[items[item].table]);
+                AddItem(player,prize,1);
+                embed.addField(items[item].name + items[item].usage + user[player].name, "They have obtained a " + prize + " Congratulations!");
+            break;
+        }
+    } 
 
+    user[player].inventory[item].amount -= 1;
+    
     channel.send(embed);
 }
 function ValidatePlayer(player){
     if(!user[player]){
         user[player] = {};    
-    }
-    if(!user[player].name){
-        user[player].name = message.author.username;
     }
     if(!user[player].inventory){
         user[player].inventory = {};
@@ -155,6 +157,10 @@ bot.on('message', message=> {
     
     ValidatePlayer(player);
 
+    if(!user[player].name){
+        user[player].name = message.author.username;
+    }
+
     user[player].channel = message.channel.id;
 
     let gm = message.guild.roles.find(x => x.name === "GameMaster").id;
@@ -178,7 +184,9 @@ bot.on('message', message=> {
                 embed.setTitle(user[player].name + "'s Inventory");
                 var myItems = [];
                 for(var key in user[player].inventory){
-                    myItems.push(user[player].inventory[key].name + " Amount: " + user[player].inventory[key].amount);
+                    if(user[player].inventory[key].amount > 0){
+                        myItems.push(user[player].inventory[key].name + " Amount: " + user[player].inventory[key].amount);
+                    }   
                 }
                 if(myItems.length < 1){
                     myItems.push("Nothing");
