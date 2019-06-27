@@ -61,7 +61,7 @@ function Game(){
     if(server.timer <= 0){
         //DO SOMETHING
         for(var key in user){
-            AddItem(key,"TECH AERO PRIZE BOX",1);
+            AddItem(key,server.item,1);
             console.log("Items Given out.");
         }
         server.timer = 60;
@@ -182,6 +182,13 @@ bot.on('message', message=> {
                 embed.addField("Items",myItems);
                 embed.setThumbnail(message.author.avatarURL);
                 message.channel.send(embed);
+            break;
+            case 'setitem':
+                if(powerful){
+                    var newItem = args.splice(args[0]);
+                    server.item = newItem;
+                    console.log(server.item);
+                }
             break;
             case 'clearData':
                 if(powerful){
