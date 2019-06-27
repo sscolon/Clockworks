@@ -137,7 +137,7 @@ bot.on('message', message=> {
     user[player].channel = message.author.channel.id;
 
     let gm = message.guild.roles.find(x => x.name === "GameMaster");
-    powerful = message.member.roles.has(gm);
+    var powerful = message.member.roles.has(gm);
 
     let args = message.content.substring(prefix.length).split(" ");
 
