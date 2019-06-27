@@ -54,6 +54,7 @@ function SaveData(){
 }
 function Game(){
     server.timer -= 1;
+    console.log(server.timer);
     if(!server.timer){
         server.timer = 60;
     }
@@ -65,6 +66,7 @@ function Game(){
         }
         server.timer = 60;
     }
+    SaveData();
 }
 function AddItem(player,item,amount = 1){
     if(amount < 0 || !items[item]){
@@ -77,6 +79,7 @@ function AddItem(player,item,amount = 1){
     } else {
         user[player].inventory[item].amount += amount;
     }
+    SaveData();
 }
 
 const arrSum = arr => arr.reduce((a,b) => a + b, 0)
@@ -149,7 +152,9 @@ bot.on('message', message=> {
 
     let args = message.content.substring(prefix.length).split(" ");
 
+    //Commands
     if(message.content.startsWith(prefix)){
+        //Arguments
         switch(args[0]){
             case 'hello':
                 message.reply("Hello World!");
