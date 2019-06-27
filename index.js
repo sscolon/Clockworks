@@ -217,6 +217,13 @@ bot.on('message', message=> {
                     message.reply("You are not an admin");
                 }
             break;
+            case 'test':
+                if(powerful){
+                    AddItem(player,server.item,1);
+                } else {
+                    message.reply("You are not an admin");
+                }
+            break;
             case 'rsrc':
                 message.reply("https://imgur.com/a/ZDHV8lC");
             break;
