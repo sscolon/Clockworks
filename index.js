@@ -57,7 +57,7 @@ function Game(){
         server.timer = 1200;
     }
     server.timer -= 1;
-    console.log(server.timer); 
+  //  console.log(server.timer); 
     if(server.timer <= 0){
         //DO SOMETHING
         for(var key in user){
