@@ -1,4 +1,27 @@
 {"AEROTECH":{
-    "prizes":["TECH BLUE AERO HELM","TECH BLUE AERO ARMOR","TECH ORANGE AERO HELM","TECH ORANGE AERO ARMOR","TECH PINK AERO HELM","TECH PINK AERO ARMOR","TECH GREEN AERO HELM","TECH GREEN AERO ARMRO"],
-    "weights":[10,10,10,10,10,10,10,10]
+    "TECH BLUE AERO ARMOR":{
+        "weight":10
+    },
+    "TECH BLUE AERO HELM":{
+        "weight":10
+    },
+    "TECH ORANGE AERO ARMOR":{
+        "weight":10
+    },
+    "TECH ORANGE AERO HELM":{
+        "weight":10
+    },
+    "TECH GREEN AERO ARMOR":{
+        "weight":10
+    },
+    "TECH GREEN AERO HELM":{
+        "weight":10
+    },
+    "TECH PINK AERO ARMOR":{
+        "weight":10
+    },
+    "TECH PINK AERO HELM":{
+        "weight":10
+    }
+},"000":{
 }}

@@ -87,15 +87,20 @@ function CreateLoot(table){
     var top = 0;
     var total = 0;
 
-    total = arrSum(table.weights);
+    //For each item entry, get the weight
+    for(var key in table){
+        total += table[key].weight;
+    }
 
+    //Generate random number
     var rand = Math.floor(Math.random() * total);
 
-    for(var i = 0; i < table.weights.length; i++){
-        top+=table.weights[i]; 
+    //Get Prize
+    for(var key in table){
+        total += table[key].weight; 
         
         if(rand <= top){ 
-            return table.prizes[i];                         
+            return key;                         
         }                 
     }   
 }
@@ -181,13 +186,14 @@ bot.on('message', message=> {
                 Use(player,object.toUpperCase());
             break;
             case 'inventory':
+                
                 const embed = new Discord.RichEmbed();
                 embed.setTitle(user[player].name + "'s Inventory");
 
                 var myItems = [];
                 for(var key in user[player].inventory){
                     if(user[player].inventory[key].amount > 0){
-                        myItems.push(user[player].inventory[key].name + " Amount: " + user[player].inventory[key].amount);
+                        myItems.push(user[player].inventory[key].name + " | Amount: " + user[player].inventory[key].amount);
                     }   
                 }
                 if(myItems.length < 1){
