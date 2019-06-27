@@ -120,6 +120,7 @@ function Use(player,item){
                 var prize = CreateLoot(table[items[item].table]);
                 AddItem(player,prize,1);
                 embed.addField(items[item].name + items[item].usage + user[player].name, "They have obtained a " + prize + " Congratulations!");
+                embed.setThumbnail(items[item].icon);
             break;
         }
     } 
@@ -182,6 +183,7 @@ bot.on('message', message=> {
             case 'inventory':
                 const embed = new Discord.RichEmbed();
                 embed.setTitle(user[player].name + "'s Inventory");
+
                 var myItems = [];
                 for(var key in user[player].inventory){
                     if(user[player].inventory[key].amount > 0){
@@ -191,6 +193,8 @@ bot.on('message', message=> {
                 if(myItems.length < 1){
                     myItems.push("Nothing");
                 }
+                myItems.sort();
+
                 embed.addField("Items",myItems);
                 embed.setThumbnail(message.author.avatarURL);
                 message.channel.send(embed);
@@ -203,6 +207,9 @@ bot.on('message', message=> {
                 } else {
                     message.reply("You are not an admin");
                 }
+            break;
+            case 'rsrc':
+                message.reply("https://imgur.com/a/ZDHV8lC");
             break;
             case 'clearData':
                 if(powerful){
