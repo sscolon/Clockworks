@@ -158,7 +158,7 @@ bot.on('message', message=> {
             break;
             case 'inventory':
                 const embed = new Discord.RichEmbed();
-                embed.setTitle(user[player].name = "'s Inventory");
+                embed.setTitle(user[player].name + "'s Inventory");
                 var myItems = [];
                 for(var key in user[player].inventory){
                     myItems.push(user[player].inventory[key].name + " Amount: " + user[player].inventory[key].amount);
