@@ -211,7 +211,7 @@ bot.on('message', message=> {
             case 'setitem':
                 if(powerful){
                     var newItem = Argument(args);
-                    server.item = newItem;
+                    server.item = newItem.toUpperCase();
                     console.log(server.item);
                 } else {
                     message.reply("You are not an admin");
@@ -220,8 +220,6 @@ bot.on('message', message=> {
             case 'test':
                 if(powerful){
                     AddItem(player,server.item,1);
-                } else {
-                    message.reply("You are not an admin");
                 }
             break;
             case 'rsrc':
