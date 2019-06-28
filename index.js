@@ -99,23 +99,26 @@ function CreateLoot(myTable){
     //Generate random number
     var rand = Math.floor(Math.random() * total);
     var item;
+    var colorPool;
     //Get Prize
     for(var key in myTable){
         top += myTable[key].weight; 
         
         if(rand <= top){ 
             //Found Item, now roll color
+            colorPool = myTable[key].colors;
             item = key;                         
         }                 
     }  
+    
     top = 0;
     total = 0;
-    for(var key in myTable[item]){
-        total += myTable[item][key].weight;
+    for(var key in table[colorPool]){
+        total += table[colorPool].key.weight;
     }
     rand = Math.floor(Math.random() * total);
-    for(var key in myTable[item]){
-        top += myTable[key].weight; 
+    for(var key in table[colorPool]){
+        top += table[colorPool].key.weight;
         
         if(rand <= top){ 
             //Found Color

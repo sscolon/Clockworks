@@ -1,11 +1,23 @@
 {"AEROTECH":{
     "AERO ARMOR":{
-        "colors":{"TECH BLUE":10,"TECH ORANGE":10,"TECH GREEN":10,"TECH PINK":10},
+        "colors":"TECH",
         "weight":10
     }, 
     "AERO HELM":{
-        "colors":{"TECH BLUE":10,"TECH ORANGE":10,"TECH GREEN":10,"TECH PINK":10},
+        "colors":"TECH",
         "weight":10
     }
-},"000":{
+},"TECH":{
+    "TECH BLUE":{
+        "weight":10
+    },
+    "TECH ORANGE":{
+        "weight":10
+    },
+    "TECH PINK":{
+        "weight":10
+    },
+    "TECH GREEN":{
+        "weight":10
+    }
 }}
