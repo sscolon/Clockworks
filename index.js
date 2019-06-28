@@ -62,7 +62,9 @@ function Game(){
         //DO SOMETHING
         for(var key in user){
             AddItem(key,server.item,1);
-            console.log("Items Given out.");
+           // console.log("Items Given out.");
+           var channel = bot.channels.get(server.channel);
+           channel.send(server.item + "s have been distributed.");
         }
         server.timer = 12000;
     }
@@ -70,15 +72,17 @@ function Game(){
 }
 function AddItem(player,item,amount = 1){
     if(amount < 0 || !items[item]){
-        console.log("Failure: Attempted to give: " + item + " Amount attempted to give: " + amount)
+        console.log("Failure: Attempted to give: " + item + " Amount attempted to give: " + amount);
         return;
     }
     if(!user[player].inventory[item]){
         user[player].inventory[item] = {};
         user[player].inventory[item].name = items[item].name;
-        user[player].inventory[item].amount = 0 + amount;
+        user[player].inventory[item].amount = amount;
+        console.log(user[player].inventory[item].amount);
     } else {
         user[player].inventory[item].amount += amount;
+        console.log(user[player].inventory[item].amount);
     }
 }
 
@@ -94,15 +98,32 @@ function CreateLoot(myTable){
     console.log(total);
     //Generate random number
     var rand = Math.floor(Math.random() * total);
-
+    var item;
     //Get Prize
     for(var key in myTable){
         top += myTable[key].weight; 
         
         if(rand <= top){ 
-            return key;                         
+            //Found Item, now roll color
+            item = key;                         
         }                 
-    }   
+    }  
+    top = 0;
+    total = 0;
+    for(var key in myTable[item]){
+        total += myTable[item][key].weight;
+    }
+    rand = Math.floor(Math.random() * total);
+    for(var key in myTable[item]){
+        top += myTable[key].weight; 
+        
+        if(rand <= top){ 
+            //Found Color
+            //Put together pieces for new item
+            return key + " " + item;                         
+        }  
+    }
+   
 }
 
 function Use(player,item){
@@ -126,11 +147,12 @@ function Use(player,item){
                 AddItem(player,prize,1);
                 embed.addField(items[item].name + items[item].usage + user[player].name, "They have obtained a " + prize + " Congratulations!");
                 embed.setThumbnail(items[prize].icon);
+                user[player].inventory[item].amount -= 1;
+
             break;
         }
     } 
 
-    user[player].inventory[item].amount -= 1;
     
     channel.send(embed);
 }
@@ -181,6 +203,16 @@ bot.on('message', message=> {
     if(message.content.startsWith(prefix)){
         //Arguments
         switch(args[0]){
+	        case 'setchannel':
+	           if(powerful){
+	               server.channel = message.channel.id;
+               }
+	        break;
+            case 'force':
+	           if(powerful){
+					server.timer = 10;
+				}
+            break;
             case 'hello':
                 message.reply("Hello World!");
             break;

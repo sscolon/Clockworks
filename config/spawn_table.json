@@ -1,26 +1,10 @@
 {"AEROTECH":{
-    "TECH BLUE AERO ARMOR":{
+    "AERO ARMOR":{
+        "colors":{"TECH BLUE":10,"TECH ORANGE":10,"TECH GREEN":10,"TECH PINK":10},
         "weight":10
-    },
-    "TECH BLUE AERO HELM":{
-        "weight":10
-    },
-    "TECH ORANGE AERO ARMOR":{
-        "weight":10
-    },
-    "TECH ORANGE AERO HELM":{
-        "weight":10
-    },
-    "TECH GREEN AERO ARMOR":{
-        "weight":10
-    },
-    "TECH GREEN AERO HELM":{
-        "weight":10
-    },
-    "TECH PINK AERO ARMOR":{
-        "weight":10
-    },
-    "TECH PINK AERO HELM":{
+    }, 
+    "AERO HELM":{
+        "colors":{"TECH BLUE":10,"TECH ORANGE":10,"TECH GREEN":10,"TECH PINK":10},
         "weight":10
     }
 },"000":{
