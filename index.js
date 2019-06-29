@@ -142,7 +142,7 @@ function CreateLoot(myTable){
         
         if(rand <= top){ 
             //Found Color
-            final.push(key);  
+            final.push(colorPool[key].name);  
             return final;                     
         }  
     }
@@ -168,7 +168,7 @@ function Use(player,item){
             case "Prize":
                 var prize = CreateLoot(table[items[item].table]);
                 AddPrizeItem(player,prize,1);
-                embed.addField(items[item].name + items[item].usage + user[player].name, "They have obtained a " + prize + " Congratulations!");
+                embed.addField(items[item].name + items[item].usage + user[player].name, "They have obtained a " + prize[1] + " " + prize[0] + " Congratulations!");
                 embed.setThumbnail(items[prize[0]].icon);
                 user[player].inventory[item].amount -= 1;
             break;
