@@ -228,7 +228,7 @@ bot.on('message', message=> {
             case 'grant':
                 var object = Argument(args);
                 if(items[object.toUpperCase()]){
-                    AddItem(player,items[object.toUpperCase()],1);
+                    AddItem(player,object.toUpperCase(),1);
                     message.reply("Wish Granted");
                 }
                 message.delete();
