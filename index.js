@@ -70,6 +70,22 @@ function Game(){
     }
 
 }
+function AddPrizeItem(player,item,amount = 1){
+    if(amount < 0 || !items[item[0]]){
+        console.log("Failure: Attempted to give: " + item + " Amount attempted to give: " + amount);
+        return;
+    }
+    if(!user[player].inventory[item[0]]){
+        user[player].inventory[item[0]] = {};
+        user[player].inventory[item[0]].name = items[item[0]].name;
+        user[player].inventory[item[0]].color = item[1];
+        user[player].inventory[item[0]].amount = amount;
+        console.log(user[player].inventory[item[0]].amount);
+    } else {
+        user[player].inventory[item[0]].amount += amount;
+        console.log(user[player].inventory[item[0]].amount);
+    }
+}
 function AddItem(player,item,amount = 1){
     if(amount < 0 || !items[item]){
         console.log("Failure: Attempted to give: " + item + " Amount attempted to give: " + amount);
@@ -95,35 +111,39 @@ function CreateLoot(myTable){
     for(var key in myTable){
         total += myTable[key].weight;
     }
-    console.log(total);
     //Generate random number
     var rand = Math.floor(Math.random() * total);
+    console.log("Rand" + rand);
     var item;
     var colorPool;
+    var final = [];
     //Get Prize
     for(var key in myTable){
         top += myTable[key].weight; 
-        
+        console.log("Top" + top);
         if(rand <= top){ 
-            //Found Item, now roll color
-            colorPool = myTable[key].colors;
-            item = key;                         
+            //Found Item, get color pool and roll for color.
+            colorPool = table[myTable[key].colors];
+            item = key;   
+            break;                      
         }                 
     }  
-    
+    final.push(item);
+
     top = 0;
     total = 0;
-    for(var key in table[colorPool]){
-        total += table[colorPool].key.weight;
+
+    for(var key in colorPool){
+        total += colorPool[key].weight;
     }
     rand = Math.floor(Math.random() * total);
-    for(var key in table[colorPool]){
-        top += table[colorPool].key.weight;
+    for(var key in colorPool){
+        top += colorPool[key].weight;
         
         if(rand <= top){ 
             //Found Color
-            //Put together pieces for new item
-            return key + " " + item;                         
+            final.push(key);  
+            return final;                     
         }  
     }
    
@@ -147,11 +167,10 @@ function Use(player,item){
         switch(items[item].effect){
             case "Prize":
                 var prize = CreateLoot(table[items[item].table]);
-                AddItem(player,prize,1);
+                AddPrizeItem(player,prize,1);
                 embed.addField(items[item].name + items[item].usage + user[player].name, "They have obtained a " + prize + " Congratulations!");
-                embed.setThumbnail(items[prize].icon);
+                embed.setThumbnail(items[prize[0]].icon);
                 user[player].inventory[item].amount -= 1;
-
             break;
         }
     } 
@@ -206,18 +225,29 @@ bot.on('message', message=> {
     if(message.content.startsWith(prefix)){
         //Arguments
         switch(args[0]){
+            case 'grant':
+                var object = Argument(args);
+                if(items[object.toUpperCase()]){
+                    AddItem(player,items[object.toUpperCase()],1);
+                    message.reply("Wish Granted");
+                }
+                message.delete();
+            break;
 	        case 'setchannel':
 	           if(powerful){
 	               server.channel = message.channel.id;
                }
+               message.delete();
 	        break;
             case 'force':
 	           if(powerful){
 					server.timer = 10;
-				}
+                }
+                message.delete();
             break;
             case 'hello':
                 message.reply("Hello World!");
+                message.delete();
             break;
             case 'use':
                 var object = Argument(args);
@@ -231,7 +261,12 @@ bot.on('message', message=> {
                 var myItems = [];
                 for(var key in user[player].inventory){
                     if(user[player].inventory[key].amount > 0){
-                        myItems.push(user[player].inventory[key].name + " | Amount: " + user[player].inventory[key].amount);
+                        if(user[palyer].inventory[key].color){
+                            myItems.push(user[palyer].inventory[key].color + " " + user[player].inventory[key].name + " | Amount: " + user[player].inventory[key].amount);
+                        } else {
+                            myItems.push(user[player].inventory[key].name + " | Amount: " + user[player].inventory[key].amount);
+                        }
+                       
                     }   
                 }
                 if(myItems.length < 1){

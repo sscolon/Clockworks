@@ -7,6 +7,40 @@
         "colors":"TECH",
         "weight":10
     }
+},"SLIME 000":{
+    "NODE SLIME MASK":{
+        "weight":35,
+        "colors":"BASIC"
+    },
+    "NODE SLIME GUARDS":{
+        "weight":30,
+        "colors":"BASIC"
+    },
+    "NODE RECEIVER":{
+        "weight":10,
+        "colors":"BASIC"
+    },
+    "NODE CONTAINER":{
+        "weight":10,
+        "colors":"BASIC"
+    },
+    "NODE SLIME CRUSHER":{
+        "weight":7,
+        "colors":"BASIC"
+    },
+    "NODE SLIME WALL":{
+        "weight":7,
+        "colors":"BASIC"
+    },
+    "WRITHING TENDRILS":{
+        "weight":1,
+        "colors":"BASIC"
+    }
+},"SLIME TEST":{
+    "NODE SLIME MASK":{
+        "weight":35,
+        "colors":"BASIC"
+    }
 },"TECH":{
     "TECH BLUE":{
         "weight":10
@@ -18,6 +52,31 @@
         "weight":10
     },
     "TECH GREEN":{
+        "weight":10
+    }
+},"BASIC":{
+    "FANCY":{
+        "weight":10
+    },
+    "DUSKY":{
+        "weight":10
+    },
+    "REGAL":{
+        "weight":10
+    },
+    "TOASTY":{
+        "weight":10
+    },
+    "HEAVY":{
+        "weight":10
+    },
+    "MILITARY":{
+        "weight":10
+    },
+    "DIVINE":{
+        "weight":10
+    },
+    "VOLCANIC":{
         "weight":10
     }
 }}

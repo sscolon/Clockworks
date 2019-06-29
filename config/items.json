@@ -29,4 +29,50 @@
 },"TECH GREEN AERO ARMOR":{
     "name":"Tech Green Aero Armor",
     "icon":"https://i.imgur.com/C2IPd6h.png"
-}}
+},"SLIME TEST":{
+    "name":"Slime Test Box",
+    "icon":"https://i.imgur.com/O8D5W0w.png",
+    "usage":" is being unboxed by ",
+    "table":"SLIME TEST",
+    "type":"Usable",
+    "effect":"Prize"
+},"NODE SLIME MASK":{
+    "name":"Node Slime Mask",
+    "REGAL":{
+        "name":"Regal Node Slime Mask",
+        "icon":"https://i.imgur.com/o3MuIbb.png"
+    },
+    "TOASTY":{
+        "name":"Toasty Node Slime Mask",
+        "icon":"https://i.imgur.com/jflAVnA.png"
+    },
+    "FANCY":{
+        "name":"Fancy Node Slime Mask",
+        "icon":"https://i.imgur.com/EFwrO1H.png"
+    },
+    "DUSKY":{
+        "name":"Dusky Node Slime Mask",
+        "icon":"https://i.imgur.com/crp3fbO.png"
+    },
+    "MILITARY":{
+        "name":"Military Node Slime Mask",
+        "icon":"https://i.imgur.com/7zzGywm.png"
+    },
+    "HEAVY":{
+        "name":"Heavy Node Slime Mask",
+        "icon":"https://i.imgur.com/lbzF2I2.png"
+    },
+    "COOL":{
+        "name":"Cool Node Slime Mask",
+        "icon":"https://i.imgur.com/W70anaN.png"
+    },
+    "DIVINE":{
+        "name":"Divine Node Slime Mask",
+        "icon":"https://i.imgur.com/3bheElA.png"
+    },
+    "VOLCANIC":{
+        "name":"Volcanic Node Slime Mask",
+        "icon":"https://i.imgur.com/MLRmSNH.png"
+    }
+}
+}
