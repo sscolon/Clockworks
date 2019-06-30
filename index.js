@@ -184,11 +184,11 @@ function Use(player,item){
                 AddPrizeItem(player,prize,1);
                 embed.addField(items[item].name + items[item].usage + user[player].name, "They have obtained a " + prize[1] + " " + prize[0] + " Congratulations!");
                 
-                var config = items[item[0]];
+                var config = items[prize[0]];
                 var icon;
-                
+
                 for (var key in config){
-                    if(key === item[1]){
+                    if(key === prize[1]){
                         icon = config[key].icon;
                     }
                 } 
