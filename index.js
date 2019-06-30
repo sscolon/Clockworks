@@ -19,9 +19,9 @@ const fs = require('fs');
 let server = JSON.parse(fs.readFileSync('.data/server.json','utf8')); //Server Information
 let user = JSON.parse(fs.readFileSync('.data/user.json','utf8')); // Player Stats
 
-let table = JSON.parse(fs.readFileSync('.data/spawn_table.json','utf8')); //Table
-let items = JSON.parse(fs.readFileSync('config/items.json','utf8')); //Items
 let table = JSON.parse(fs.readFileSync('config/spawn_table.json','utf8')); //Table
+let items = JSON.parse(fs.readFileSync('config/items.json','utf8')); //Items
+
 
 
 
@@ -183,7 +183,17 @@ function Use(player,item){
                 var prize = CreateLoot(table[items[item].table]);
                 AddPrizeItem(player,prize,1);
                 embed.addField(items[item].name + items[item].usage + user[player].name, "They have obtained a " + prize[1] + " " + prize[0] + " Congratulations!");
-                embed.setThumbnail(items[prize[0]].icon);
+                
+                var config = items[item[0]];
+                var icon;
+                
+                for (var key in config){
+                    if(key === item[1]){
+                        icon = config[key].icon;
+                    }
+                } 
+               
+                embed.setThumbnail(icon);
                 user[player].inventory[item].amount -= 1;
             break;
         }

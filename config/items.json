@@ -5,30 +5,42 @@
     "table":"AEROTECH",
     "type":"Usable",
     "effect":"Prize"
-},"TECH BLUE AERO HELM":{
-    "name":"Tech Blue Aero Helm",
-    "icon":"https://i.imgur.com/njkURA5.png"
-},"TECH ORANGE AERO HELM":{
-    "name":"Tech Orange Aero Helm",
-    "icon":"https://i.imgur.com/K6wPYqd.png"
-},"TECH PINK AERO HELM":{
-    "name":"Tech Pink Aero Helm",
-    "icon":"https://i.imgur.com/3GEvK7X.png"
-},"TECH GREEN AERO HELM":{
-    "name":"Tech Green Aero Helm",
-    "icon":"https://i.imgur.com/mao5Yi1.png"
-},"TECH BLUE AERO ARMOR":{
-    "name":"Tech Blue Aero Armor",
-    "icon":"https://i.imgur.com/HFng4JF.png"
-},"TECH ORANGE AERO ARMOR":{
-    "name":"Tech Orange Aero Armor",
-    "icon":"https://i.imgur.com/tFru6KH.png"
-},"TECH PINK AERO ARMOR":{
-    "name":"Tech Pink Aero Armor",
-    "icon":"https://i.imgur.com/BF0y2BF.png"
-},"TECH GREEN AERO ARMOR":{
-    "name":"Tech Green Aero Armor",
-    "icon":"https://i.imgur.com/C2IPd6h.png"
+},"AERO ARMOR":{
+    "name":"Aero Armor",
+    "TECH BLUE":{
+        "name":"Tech Blue Aero Armor",
+        "icon":"https://i.imgur.com/HFng4JF.png"
+    },
+    "TECH ORANGE":{
+        "name":"Tech Orange Aero Armor",
+        "icon":"https://i.imgur.com/tFru6KH.png"
+    },
+    "TECH GREEN":{
+        "name":"Tech Green Aero Armor",
+        "icon":"https://i.imgur.com/C2IPd6h.png"
+    },
+    "TECH PINK":{
+        "name":"Tech Pink Aero Armor",
+        "icon":"https://i.imgur.com/BF0y2BF.png"
+    }
+},"AERO HELM":{
+    "name":"Aero Helm",
+    "TECH BLUE":{
+        "name":"Tech Blue Aero Helm",
+        "icon":"https://i.imgur.com/njkURA5.png"
+    },
+    "TECH ORANGE":{
+        "name":"Tech Orange Aero Helm",
+        "icon":"https://i.imgur.com/K6wPYqd.png"
+    },
+    "TECH GREEN":{
+        "name":"Tech Green Aero Helm",
+        "icon":"https://i.imgur.com/mao5Yi1.png"
+    },
+    "TECH PINK":{
+        "name":"Tech Pink Aero Helm",
+        "icon":"https://i.imgur.com/3GEvK7X.png"
+    }
 },"SLIME TEST":{
     "name":"Slime Test Box",
     "icon":"https://i.imgur.com/O8D5W0w.png",
