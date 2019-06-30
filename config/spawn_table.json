@@ -75,6 +75,10 @@
         "name":"Toasty",
         "weight":10
     },
+    "COOL":{
+        "name":"Cool",
+        "weight":10
+    },  
     "HEAVY":{
         "name":"Heavy",
         "weight":10

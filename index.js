@@ -18,8 +18,11 @@ const fs = require('fs');
 
 let server = JSON.parse(fs.readFileSync('.data/server.json','utf8')); //Server Information
 let user = JSON.parse(fs.readFileSync('.data/user.json','utf8')); // Player Stats
+
+let table = JSON.parse(fs.readFileSync('.data/spawn_table.json','utf8')); //Table
 let items = JSON.parse(fs.readFileSync('config/items.json','utf8')); //Items
 let table = JSON.parse(fs.readFileSync('config/spawn_table.json','utf8')); //Table
+
 
 
 setInterval(function() {
@@ -30,6 +33,8 @@ setInterval(function() {
 function Update(){
     Game();
 }
+
+
 function Validate(json){
     try {
     //Stringify the json and then attempt to Parse it.  If the parse fails we won't save the data and should neglect all changes made.
@@ -52,6 +57,9 @@ function SaveData(){
         })   
     }
 }
+
+
+
 function Game(){
     if(!server.timer){
         server.timer = 12000;
@@ -63,8 +71,8 @@ function Game(){
         for(var key in user){
             AddItem(key,server.item,1);
            // console.log("Items Given out.");
-           var channel = bot.channels.get(server.channel);
-           channel.send(server.item + "s have been distributed.");
+           //var channel = bot.channels.get(server.channel);
+          // channel.send(server.item + "s have been distributed.");
         }
         server.timer = 12000;
     }
@@ -75,15 +83,21 @@ function AddPrizeItem(player,item,amount = 1){
         console.log("Failure: Attempted to give: " + item + " Amount attempted to give: " + amount);
         return;
     }
-    if(!user[player].inventory[item[0]]){
-        user[player].inventory[item[0]] = {};
-        user[player].inventory[item[0]].name = items[item[0]].name;
-        user[player].inventory[item[0]].color = item[1];
-        user[player].inventory[item[0]].amount = amount;
-        console.log(user[player].inventory[item[0]].amount);
+    var newItem = item[1] + " " + item[0]; 
+    if(!user[player].inventory[newItem]){
+        user[player].inventory[newItem] = {};
+        var config = items[item[0]];
+        for (var key in config){
+			if(key === item[1]){
+				user[player].inventory[newItem].name = config[key].name;
+			}
+		}  
+        user[player].inventory[newItem].color = item[1];
+        user[player].inventory[newItem].amount = amount;
+   //     console.log(user[player].inventory[item[0]].amount);
     } else {
-        user[player].inventory[item[0]].amount += amount;
-        console.log(user[player].inventory[item[0]].amount);
+        user[player].inventory[newItem].amount += amount;
+     //   console.log(user[player].inventory[item[0]].amount);
     }
 }
 function AddItem(player,item,amount = 1){
@@ -142,7 +156,7 @@ function CreateLoot(myTable){
         
         if(rand <= top){ 
             //Found Color
-            final.push(colorPool[key].name);  
+            final.push(key);  
             return final;                     
         }  
     }
@@ -261,8 +275,8 @@ bot.on('message', message=> {
                 var myItems = [];
                 for(var key in user[player].inventory){
                     if(user[player].inventory[key].amount > 0){
-                        if(user[palyer].inventory[key].color){
-                            myItems.push(user[palyer].inventory[key].color + " " + user[player].inventory[key].name + " | Amount: " + user[player].inventory[key].amount);
+                        if(user[player].inventory[key].color){
+                            myItems.push(user[player].inventory[key].name + " | Amount: " + user[player].inventory[key].amount);
                         } else {
                             myItems.push(user[player].inventory[key].name + " | Amount: " + user[player].inventory[key].amount);
                         }
@@ -297,7 +311,9 @@ bot.on('message', message=> {
             break;
             case 'clearData':
                 if(powerful){
-                    user = {};
+                    user[player].inventory = null;
+                    user[player].inventory = {};
+                    message.reply("Inventory Cleared");
                 } else {
                     message.reply("You are not an admin");
                 }
