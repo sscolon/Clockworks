@@ -1,0 +1,19 @@
+{"Emerald Phantom D8":
+{
+    "name":"Emerald Phantom D8",
+    "levels":["Tunnels","Wolver Den","Compound"],
+
+    "month":7,
+    "day":19,
+    "hour":7,
+    "minute":0,
+    "second":0,
+
+    "marker":["left","right"],
+    "selection":"left",
+
+    "level":0,
+
+    "rotation":900,
+    "markerrotation":450
+}}
