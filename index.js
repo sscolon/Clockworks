@@ -31,7 +31,19 @@ setInterval(function() {
 }, 1000);
 //Update is ran every second.
 function Update(){
-    Game();
+    //Game();
+    Clockworks();
+}
+
+
+function GetDate(seconds = 0){
+    return time = today.getHours() + ":" + today.getMinutes() + ":" + (today.getSeconds() + seconds);
+}
+function Clockworks(){
+
+}
+function UpdateSwap(depth){
+
 }
 
 
@@ -58,8 +70,7 @@ function SaveData(){
     }
 }
 
-
-
+//#region Not Used
 function Game(){
     if(!server.timer){
         server.timer = 12000;
@@ -220,6 +231,8 @@ function Argument(args){
     }
     return object;
 }
+//#endregion
+
 bot.on('ready', () => {
     console.log("Ready to go!");
 })
@@ -230,26 +243,31 @@ bot.on('message', message=> {
     if(message.channel.type === "dm"){
         return;
     } 
+   //#region no
     var player = message.author.id;
     
     ValidatePlayer(player);
 
     if(!user[player].name){
         user[player].name = message.author.username;
-    }
+    } 
+    //#endregion
 
-    user[player].channel = message.channel.id;
+ //   user[player].channel = message.channel.id;
 
     let gm = message.guild.roles.find(x => x.name === "GameMaster").id;
     var powerful = message.member.roles.has(gm);
 
     let args = message.content.substring(prefix.length).split(" ");
 
-    //Commands
+    //Commands - Disabled
     if(message.content.startsWith(prefix)){
         //Arguments
         switch(args[0]){
-            case 'grant':
+            case 'date':
+                message.send(GetDate());
+            break;
+           /* case 'grant':
                 var object = Argument(args);
                 if(items[object.toUpperCase()]){
                     AddItem(player,object.toUpperCase(),1);
@@ -327,7 +345,7 @@ bot.on('message', message=> {
                 } else {
                     message.reply("You are not an admin");
                 }
-            break;
+            break; */
         }
     }
 
