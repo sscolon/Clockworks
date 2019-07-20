@@ -215,15 +215,24 @@ function SendInfo(depth,level){
 function GetFuture(depth){
     var temp = depth.selection;
     var first = false;
+    var same = false;
     //console.log("Selection " + temp);
 
     //Checking if the marker will rotate first.
-    if(depth.marked <= depth.next){
+    if(depth.marked < depth.next){
         temp = depth.selection + 1;
         if(temp >= depth.marker.length){
             temp = 0;
         }
         first = true;
+    }
+    //If they're at the same time, we want both to happen.
+    if(depth.marked === depth.next){
+        temp = depth.selection + 1;
+        if(temp >= depth.marker.length){
+            temp = 0;
+        }
+        same = true;
     }
     
     //New Marker Position
@@ -233,7 +242,7 @@ function GetFuture(depth){
     var future = Array.from(depth.levels);
   
     //Depth rotating first
-    if(first === false){
+    if(first === false && same == false){
         switch(depth.direction){
             case 'left':
                 future = shiftArrayToRight(future,depth.levels.length - 1);
