@@ -1,20 +1,43 @@
-{"Emerald Phantom D8":
-{
-    "name":"Emerald Phantom D8",
-    "levels":["Tunnels","Wolver Den","Compound"],
-    "direction":"left",
+{"Emerald Phantom D9":
+    {
+        "name":"Emerald Phantom D9",
+        "levels":["Wolver Den","Compound","Tunnels"],
+        "direction":"left",
+        "icon":"https://imgur.com/1BcvRvb",
 
-    "month":7,
-    "day":19,
-    "hour":7,
-    "minute":0,
-    "second":0,
-
-    "marker":["left","right"],
-    "selection":0,
-
-    "level":0,
-
-    "rotation":900,
-    "markerrotation":450
-}}
+        "year":2019,
+        "month":6,
+        "day":19,
+        "hour":10,
+        "minute":30,
+        "second":0,
+    
+        "marker":["far left","far right"],
+        "selection":1,
+    
+        "level":0,
+    
+        "rotation":900,
+        "markerrotation":450
+    },"Golden Falcon D11":{
+        "name":"Golden Falcon D11",
+        "levels":["Compound","Arena","Arena"],
+        "direction":"left",
+        "icon":"https://imgur.com/E9qvfag",
+    
+        "year":2019,
+        "month":6,
+        "day":20,
+        "hour":16,
+        "minute":15,
+        "second":0,
+    
+        "marker":["far right","far left","three middle"],
+        "selection":0,
+    
+        "level":0,
+    
+        "rotation":900,
+        "markerrotation":105
+    }
+}

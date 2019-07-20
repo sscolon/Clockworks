@@ -15,40 +15,57 @@ setInterval(() => {
 }, 280000);
 
 const fs = require('fs');
+var server;
+var user;
 
-let server = JSON.parse(fs.readFileSync('.data/server.json','utf8')); //Server Information
-let user = JSON.parse(fs.readFileSync('.data/user.json','utf8')); // Player Stats
+try{
+    server = JSON.parse(fs.readFileSync('.data/server.json','utf8')); //Server Information
+    user = JSON.parse(fs.readFileSync('.data/user.json','utf8')); // Player Stats
+} catch (e){
+    server = {};
+    user = {};
+}
 
-let table = JSON.parse(fs.readFileSync('config/spawn_table.json','utf8')); //Table
-let items = JSON.parse(fs.readFileSync('config/items.json','utf8')); //Items
-
-
-
+let images = JSON.parse(fs.readFileSync('config/image.json','utf8'));
+let rotations = JSON.parse(fs.readFileSync('config/depth.json','utf8'));
 
 setInterval(function() {
     Update();
-    console.log("Updating");
-    for(var key in server){
-        UpdateSwap(server[key]);
-    }
 }, 30000);
-//Update is ran every second.
-function Update(){
-    //Game();
-    Clockworks();
-}
 
-function SetDate(month, day, hours, minutes, seconds){
-    var date = new Date();
+function Update(){
+    console.log("Updating");
+    for(var key in rotations){
+        if(rotations[key].name){
+            Instance(key);
+        } 
+    }
+    for(var key in server.depths){
+        console.log(key);
+        UpdateSwap(server.depths[key]);
+        
+    }
+}
+function Instance(depth){
+    if(!server.depths[rotations[depth].name]){
+        server.depths[rotations[depth].name] = {};
+        server.depths[rotations[depth].name] = rotations[depth];
+        SaveData();
+        console.log("New Depth!");
+    }
+}
+function SetDate(depth){
+    var initialize = new Date();
 
     //Sets a specific date, we will add offsets to this date in order to produce a swap time.
-    date.setMonth(month);
-    date.setDate(day);
-    date.setHours(hours);
-    date.setMinutes(minutes);
-    date.setSeconds(seconds);
+    initialize.setMonth(depth.month);
+    initialize.setDate(depth.day);
+    initialize.setHours(depth.hour);
+    initialize.setMinutes(depth.minute);
+    initialize.setSeconds(depth.second);
 
-    return date;
+    console.log("Init " + initialize);
+    return initialize;
 }
 function GetDate(seconds = 0, timezone = 0){
  
@@ -58,75 +75,167 @@ function GetDate(seconds = 0, timezone = 0){
     var est = date.getTime() +(date.getTimezoneOffset() * 60000)
     var newDate =  new Date(est + (3600000*timezone));
 
-    return time = newDate.toLocaleString();
+    return newDate.toLocaleString();
 
 }
 //Getting the next rotation
 function OffsetDate(init, offset){
-    var newDate = new Date();
-    newDate.setSeconds(newDate.getSeconds() + offset);
-
-    return newDate;
-}
-
-function InstanceSwapper(){
-
-
-}
-
-function Clockworks(){
-
+    var nextDate = new Date(init);
+    nextDate.setSeconds(init.getSeconds() + offset);
+    return nextDate;
 }
 
 function UpdateSwap(depth){
-    //Get the inital swap of this depth
-    var init = SetDate(depth.month,depth.day,depth.hour,depth.minute,depth.second); 
-    //Find the next level and marker swaps
-    var nextSwap = OffsetDate(init,depth.rotation);
-    var marker = OffsetDate(init,depth.markerrotation);
-
     //Store this data in another json
-    server.depths[depth.name] = depth;
+    var nextSwap;
+    var marker;
 
-    //Grab the milliseconds
-    server.depths[depth.name].next = nextSwap.getMilliseconds();
-    server.depths[depth.name].marked = marker.getMilliseconds();
+    if(!server.depths[depth.name].ready) {
+        console.log("I am not ready!.");
+        //Get the inital swap of this depth
+        var init = SetDate(depth); 
 
+        //Find the next level and marker swaps
+        nextSwap = OffsetDate(init,depth.rotation);
+        marker = OffsetDate(init,depth.markerrotation);
+
+         //Grab the milliseconds
+        server.depths[depth.name].next = new Date(nextSwap);
+        server.depths[depth.name].marked = new Date(marker);
+
+        server.depths[depth.name].ready = true;
+    }
+
+   
     //While today is in the future, keep cycling the level.
-    while(new Date().getMilliseconds() > server.depths[depth.name].next){
-        nextSwap = OffsetDate(nextSwap,depth.rotation);
-       
-        server.depths[depth.name].next = nextSwap.getMilliseconds();
+    var currentDate = new Date();
+    server.depths[depth.name].next = new Date(server.depths[depth.name].next);
+    server.depths[depth.name].marked = new Date(server.depths[depth.name].marked);
 
+    //Debugging
+    console.log("Current Time " + new Date().toLocaleString());
+    console.log("Next Swap " + server.depths[depth.name].next.toLocaleString());
+    console.log("Next Marker " + server.depths[depth.name].marked.toLocaleString());
+
+    var updated = false;
+    while(currentDate > server.depths[depth.name].next){
+        server.depths[depth.name].next = OffsetDate(server.depths[depth.name].next,depth.rotation);
+
+     //   console.log("Rotation! " + server.depths[depth.name].next + "Offset by " + depth.rotation);
+
+        //Does it switch left or right?
+        var left = server.depths[depth.name].levels.length - 1;
+        var right = 1;
         switch(server.depths[depth.name].direction){
             case 'left':
-                server.depths[depth.name].selection -= 1;
+                server.depths[depth.name].levels = shiftArrayToRight(server.depths[depth.name].levels,left);
+                console.log("Swap to the left " + server.depths[depth.name].levels);
+            break;
             case 'right':
-                server.depths[depth.name].selection += 1;
+                server.depths[depth.name].levels = shiftArrayToRight(server.depths[depth.name].levels,right);
             break;
         }
 
-        if(server.depths[depth.name].selection >= server.depths[depth.name].levels.length){
-            server.depths[depth.name].selection = 0;
-        }
-        if(server.depths[depth.name].selection < 0){
-            server.depths[depth.name].selection = server.depths[depth.name].levels.length;
-        }
-
+        updated = true;
     }
-    //While today is in the future, keep cycling the marker
-    while(new Date().getMilliseconds() > server.depths[depth.name].marker){
-        marker = OffsetDate(marker,depth.markerrotation);
 
-        server.depths[depth.name].marked = marker.getMilliseconds();
+    //While today is in the future, keep cycling the marker
+    while(currentDate > server.depths[depth.name].marked){
+        //Offset the date by the rotation time
+        server.depths[depth.name].marked = OffsetDate(server.depths[depth.name].marked,depth.markerrotation)
+     //   console.log("Cycle! " + server.depths[depth.name].marked + " offset by " + depth.markerrotation);
+      
+   
+        //Update the index
         server.depths[depth.name].selection += 1;
 
+
+        //Make sure the index doesn't go further than the array.
         if(server.depths[depth.name].selection >= server.depths[depth.name].marker.length){
+
             server.depths[depth.name].selection = 0;
         }
+
+        if(server.depths[depth.name].selection < 0){
+          
+            server.depths[depth.name].selection = server.depths[depth.name].marker.length - 1;
+        }
+        updated = true;
     }
 
+    if(updated){
+        console.log(server.depths[depth.name].levels);
+        var level = GetLevel(server.depths[depth.name]);
+        SendInfo(server.depths[depth.name],level);
+    }
+    
     SaveData();
+}
+
+function shiftArrayToRight(arr, places) {
+    for (var i = 0; i < places; i++) {
+        arr.unshift(arr.pop());
+    }
+    return arr;
+}
+function SendInfo(depth,level){
+    var channel = bot.channels.get("602110386967150600");
+    var embed = new Discord.RichEmbed();
+    embed.setTitle("Clockworks")
+    embed.addField(depth.name + " is updating!", `${depth.name} has swapped to ${level}`)
+    embed.addField("Current Marker Position: ", depth.marker[depth.selection])
+    embed.addField("Next Marker Swap: ",  depth.marked)
+    embed.addField("Next Level Swap:", depth.next)
+    embed.addField("Level Cycle ", "From Left to Right " + `${depth.levels}`)
+    embed.addField("Direction: ", depth.direction)
+    embed.setThumbnail(depth.icon);
+
+    //Try to edit previous message, if you can't do that, create a new one.
+    try{
+        channel.fetchMessage(depth.id).then (levelset => {
+            levelset.edit(embed);
+        })
+    } catch(e){
+        
+        console.log("Instancing New Depth")
+        channel.send(embed).then (sentEmbed => {
+            depth.id = sentEmbed.id;
+        });
+    } 
+}
+
+function GetLevel(depth){
+    //What position the marker is in.
+    var pos = depth.marker[depth.selection];
+    var level;
+    console.log("Get Level " + depth.levels);
+    switch(pos){
+        case 'far right':
+            level = depth.levels[depth.levels.length - 1];
+        break;
+        case 'far left':
+            level = depth.levels[0];
+        break;
+        case 'three middle':
+            level = depth.levels[1];
+        break;
+        case 'five middle':
+            level = depth.levels[2];
+        break;
+        case 'four middle left':
+            level = depth.levels[1];
+        break;
+        case 'four middle right':
+            level = depth.levels[2];
+        break;
+        case 'five middle left':
+            level = depth.levels[1];
+        break;
+        case 'five middle right':
+            level = depth.levels[3];
+        break;
+    }
+    return level;
 }
 
 
@@ -153,167 +262,6 @@ function SaveData(){
     }
 }
 
-//#region Not Used
-function Game(){
-    if(!server.timer){
-        server.timer = 12000;
-    }
-    server.timer -= 1;
-  //  console.log(server.timer); 
-    if(server.timer <= 0){
-        //DO SOMETHING
-        for(var key in user){
-            AddItem(key,server.item,1);
-           // console.log("Items Given out.");
-           //var channel = bot.channels.get(server.channel);
-          // channel.send(server.item + "s have been distributed.");
-        }
-        server.timer = 12000;
-    }
-
-}
-function AddPrizeItem(player,item,amount = 1){
-    if(amount < 0 || !items[item[0]]){
-        console.log("Failure: Attempted to give: " + item + " Amount attempted to give: " + amount);
-        return;
-    }
-    var newItem = item[1] + " " + item[0]; 
-    if(!user[player].inventory[newItem]){
-        user[player].inventory[newItem] = {};
-        var config = items[item[0]];
-        for (var key in config){
-			if(key === item[1]){
-				user[player].inventory[newItem].name = config[key].name;
-			}
-		}  
-        user[player].inventory[newItem].color = item[1];
-        user[player].inventory[newItem].amount = amount;
-   //     console.log(user[player].inventory[item[0]].amount);
-    } else {
-        user[player].inventory[newItem].amount += amount;
-     //   console.log(user[player].inventory[item[0]].amount);
-    }
-}
-function AddItem(player,item,amount = 1){
-    if(amount < 0 || !items[item]){
-        console.log("Failure: Attempted to give: " + item + " Amount attempted to give: " + amount);
-        return;
-    }
-    if(!user[player].inventory[item]){
-        user[player].inventory[item] = {};
-        user[player].inventory[item].name = items[item].name;
-        user[player].inventory[item].amount = amount;
-        console.log(user[player].inventory[item].amount);
-    } else {
-        user[player].inventory[item].amount += amount;
-        console.log(user[player].inventory[item].amount);
-    }
-}
-
-const arrSum = arr => arr.reduce((a,b) => a + b, 0)
-function CreateLoot(myTable){
-    var top = 0;
-    var total = 0;
-
-    //For each item entry, get the weight
-    for(var key in myTable){
-        total += myTable[key].weight;
-    }
-    //Generate random number
-    var rand = Math.floor(Math.random() * total);
-    console.log("Rand" + rand);
-    var item;
-    var colorPool;
-    var final = [];
-    //Get Prize
-    for(var key in myTable){
-        top += myTable[key].weight; 
-        console.log("Top" + top);
-        if(rand <= top){ 
-            //Found Item, get color pool and roll for color.
-            colorPool = table[myTable[key].colors];
-            item = key;   
-            break;                      
-        }                 
-    }  
-    final.push(item);
-
-    top = 0;
-    total = 0;
-
-    for(var key in colorPool){
-        total += colorPool[key].weight;
-    }
-    rand = Math.floor(Math.random() * total);
-    for(var key in colorPool){
-        top += colorPool[key].weight;
-        
-        if(rand <= top){ 
-            //Found Color
-            final.push(key);  
-            return final;                     
-        }  
-    }
-   
-}
-
-function Use(player,item){
-    //Get Player Channel
-    var channel = bot.channels.get(user[player].channel);
-    try {
-        items[item].usage;
-    } catch(e) {
-        console.log(item + " is not a usable");
-        return;
-    }
-    const embed = new Discord.RichEmbed();
-    embed.setTitle(user[player].name + " is using " + items[item].name)
-
-    if(user[player].inventory[item].amount < 1){
-        embed.addField("You don't have that item","Sorry");
-    } else {
-        switch(items[item].effect){
-            case "Prize":
-                var prize = CreateLoot(table[items[item].table]);
-                AddPrizeItem(player,prize,1);
-                embed.addField(items[item].name + items[item].usage + user[player].name, "They have obtained a " + prize[1] + " " + prize[0] + " Congratulations!");
-                
-                var config = items[prize[0]];
-                var icon;
-
-                for (var key in config){
-                    if(key === prize[1]){
-                        icon = config[key].icon;
-                    }
-                } 
-               
-                embed.setThumbnail(icon);
-                user[player].inventory[item].amount -= 1;
-            break;
-        }
-    } 
-
-    
-    channel.send(embed);
-}
-function ValidatePlayer(player){
-    if(!user[player]){
-        user[player] = {};    
-    }
-    if(!user[player].inventory){
-        user[player].inventory = {};
-    }
-}
-function Argument(args){
-    var object = "";
-    for(var i = 1; i < args.length; i++){
-        object += args[i];
-        if(args[i + 1]){
-            object += " ";
-        }
-    }
-    return object;
-}
 //#endregion
 
 bot.on('ready', () => {
@@ -326,19 +274,6 @@ bot.on('message', message=> {
     if(message.channel.type === "dm"){
         return;
     } 
-   //#region no
-    var player = message.author.id;
-    
-    ValidatePlayer(player);
-
-    if(!user[player].name){
-        user[player].name = message.author.username;
-    } 
-    //#endregion
-
- //   user[player].channel = message.channel.id;
-
-    server.depths = {};
     
     let gm = message.guild.roles.find(x => x.name === "GameMaster").id;
     var powerful = message.member.roles.has(gm);
@@ -349,89 +284,18 @@ bot.on('message', message=> {
     if(message.content.startsWith(prefix)){
         //Arguments
         switch(args[0]){
+            case 'clear':
+                server = {};
+                server.depths = {};
+                SaveData();
+                console.log("Data Cleared");
+            break;
+            case 'update':
+                Update();
+            break;
             case 'date':
                 message.channel.send(GetDate());
             break;
-            
-           /* case 'grant':
-                var object = Argument(args);
-                if(items[object.toUpperCase()]){
-                    AddItem(player,object.toUpperCase(),1);
-                    message.reply("Wish Granted");
-                }
-                message.delete();
-            break;
-	        case 'setchannel':
-	           if(powerful){
-	               server.channel = message.channel.id;
-               }
-               message.delete();
-	        break;
-            case 'force':
-	           if(powerful){
-					server.timer = 10;
-                }
-                message.delete();
-            break;
-            case 'hello':
-                message.reply("Hello World!");
-                message.delete();
-            break;
-            case 'use':
-                var object = Argument(args);
-                Use(player,object.toUpperCase());
-            break;
-            case 'inventory':
-                
-                const embed = new Discord.RichEmbed();
-                embed.setTitle(user[player].name + "'s Inventory");
-
-                var myItems = [];
-                for(var key in user[player].inventory){
-                    if(user[player].inventory[key].amount > 0){
-                        if(user[player].inventory[key].color){
-                            myItems.push(user[player].inventory[key].name + " | Amount: " + user[player].inventory[key].amount);
-                        } else {
-                            myItems.push(user[player].inventory[key].name + " | Amount: " + user[player].inventory[key].amount);
-                        }
-                       
-                    }   
-                }
-                if(myItems.length < 1){
-                    myItems.push("Nothing");
-                }
-                myItems.sort();
-
-                embed.addField("Items",myItems);
-                embed.setThumbnail(message.author.avatarURL);
-                message.channel.send(embed);
-            break;
-            case 'setitem':
-                if(powerful){
-                    var newItem = Argument(args);
-                    server.item = newItem.toUpperCase();
-                    console.log(server.item);
-                } else {
-                    message.reply("You are not an admin");
-                }
-            break;
-            case 'test':
-                if(powerful){
-                    AddItem(player,server.item,1);
-                }
-            break;
-            case 'rsrc':
-                message.reply("https://imgur.com/a/ZDHV8lC");
-            break;
-            case 'clearData':
-                if(powerful){
-                    user[player].inventory = null;
-                    user[player].inventory = {};
-                    message.reply("Inventory Cleared");
-                } else {
-                    message.reply("You are not an admin");
-                }
-            break; */
         }
     }
 
