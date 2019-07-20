@@ -27,23 +27,106 @@ let items = JSON.parse(fs.readFileSync('config/items.json','utf8')); //Items
 
 setInterval(function() {
     Update();
-    
-}, 1000);
+    console.log("Updating");
+    for(var key in server){
+        UpdateSwap(server[key]);
+    }
+}, 30000);
 //Update is ran every second.
 function Update(){
     //Game();
     Clockworks();
 }
 
+function SetDate(month, day, hours, minutes, seconds){
+    var date = new Date();
 
-function GetDate(seconds = 0){
-    return time = today.getHours() + ":" + today.getMinutes() + ":" + (today.getSeconds() + seconds);
+    //Sets a specific date, we will add offsets to this date in order to produce a swap time.
+    date.setMonth(month);
+    date.setDate(day);
+    date.setHours(hours);
+    date.setMinutes(minutes);
+    date.setSeconds(seconds);
+
+    return date;
 }
+function GetDate(seconds = 0, timezone = 0){
+ 
+    var date = new Date();
+    date.setSeconds(date.getSeconds() + seconds);
+
+    var est = date.getTime() +(date.getTimezoneOffset() * 60000)
+    var newDate =  new Date(est + (3600000*timezone));
+
+    return time = newDate.toLocaleString();
+
+}
+//Getting the next rotation
+function OffsetDate(init, offset){
+    var newDate = new Date();
+    newDate.setSeconds(newDate.getSeconds() + offset);
+
+    return newDate;
+}
+
+function InstanceSwapper(){
+
+
+}
+
 function Clockworks(){
 
 }
-function UpdateSwap(depth){
 
+function UpdateSwap(depth){
+    //Get the inital swap of this depth
+    var init = SetDate(depth.month,depth.day,depth.hour,depth.minute,depth.second); 
+    //Find the next level and marker swaps
+    var nextSwap = OffsetDate(init,depth.rotation);
+    var marker = OffsetDate(init,depth.markerrotation);
+
+    //Store this data in another json
+    server.depths[depth.name] = depth;
+
+    //Grab the milliseconds
+    server.depths[depth.name].next = nextSwap.getMilliseconds();
+    server.depths[depth.name].marked = marker.getMilliseconds();
+
+    //While today is in the future, keep cycling the level.
+    while(new Date().getMilliseconds() > server.depths[depth.name].next){
+        nextSwap = OffsetDate(nextSwap,depth.rotation);
+       
+        server.depths[depth.name].next = nextSwap.getMilliseconds();
+
+        switch(server.depths[depth.name].direction){
+            case 'left':
+                server.depths[depth.name].selection -= 1;
+            case 'right':
+                server.depths[depth.name].selection += 1;
+            break;
+        }
+
+        if(server.depths[depth.name].selection >= server.depths[depth.name].levels.length){
+            server.depths[depth.name].selection = 0;
+        }
+        if(server.depths[depth.name].selection < 0){
+            server.depths[depth.name].selection = server.depths[depth.name].levels.length;
+        }
+
+    }
+    //While today is in the future, keep cycling the marker
+    while(new Date().getMilliseconds() > server.depths[depth.name].marker){
+        marker = OffsetDate(marker,depth.markerrotation);
+
+        server.depths[depth.name].marked = marker.getMilliseconds();
+        server.depths[depth.name].selection += 1;
+
+        if(server.depths[depth.name].selection >= server.depths[depth.name].marker.length){
+            server.depths[depth.name].selection = 0;
+        }
+    }
+
+    SaveData();
 }
 
 
@@ -255,6 +338,8 @@ bot.on('message', message=> {
 
  //   user[player].channel = message.channel.id;
 
+    server.depths = {};
+    
     let gm = message.guild.roles.find(x => x.name === "GameMaster").id;
     var powerful = message.member.roles.has(gm);
 
@@ -265,8 +350,9 @@ bot.on('message', message=> {
         //Arguments
         switch(args[0]){
             case 'date':
-                message.send(GetDate());
+                message.channel.send(GetDate());
             break;
+            
            /* case 'grant':
                 var object = Argument(args);
                 if(items[object.toUpperCase()]){
