@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Testing",
   "main": "index.js",
-  "start": "index.js",
   "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,9 +10,7 @@
   "author": "Gerudum",
   "license": "ISC",
   "dependencies": {
-    "discord": "^0.8.2",
     "discord.js": "^11.5.1",
-    "express": "^4.17.1",
-    "node": "^12.4.0"
+    "express": "^4.17.1"
   }
 }

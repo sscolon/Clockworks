@@ -365,20 +365,23 @@ bot.on('message', message=> {
     //Commands - Disabled
     if(message.content.startsWith(prefix)){
         //Arguments
-        switch(args[0]){
-            case 'clear':
-                server = {};
-                server.depths = {};
-                SaveData();
-                //console.log("Data Cleared");
-            break;
-            case 'update':
-                Update();
-            break;
-            case 'date':
-                message.channel.send(GetDate());
-            break;
+        if(gm){
+            switch(args[0]){
+                case 'clear':
+                    server = {};
+                    server.depths = {};
+                    SaveData();
+                    //console.log("Data Cleared");
+                break;
+                case 'update':
+                    Update();
+                break;
+                case 'date':
+                    message.channel.send(GetDate());
+                break;
+            }
         }
+        
     }
 
     SaveData();
