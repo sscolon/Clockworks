@@ -182,11 +182,11 @@ function SendInfo(depth,level){
     var channel = bot.channels.get("602110386967150600");
     var embed = new Discord.RichEmbed();
     embed.setTitle("Clockworks")
-    embed.addField(depth.name + " is updating!", `${depth.name} has swapped to ${level}`)
+    embed.addField(depth.name + "'s Status'", `${depth.name} recently swapped to ${level}`)
     embed.addField("Current Marker Position: ", depth.marker[depth.selection])
     embed.addField("Next Marker Swap: ",  depth.marked)
     embed.addField("Next Level Swap:", depth.next)
-    embed.addField("Level Cycle ", "From Left to Right " + `${depth.levels}`)
+    embed.addField("Level Cycle ", ": " + `${depth.levels}`)
     embed.addField("Direction: ", depth.direction)
     embed.setThumbnail(depth.icon);
 
