@@ -150,7 +150,7 @@ function UpdateSwap(depth){
     }
 
 
-  /*  if(instance){
+    if(instance){
         //Something is causing it to shift 1 too many times, so we have to shift back.
         //console.log("Shift Back");
         switch(server.depths[depth.name].direction){
@@ -163,7 +163,7 @@ function UpdateSwap(depth){
                 server.depths[depth.name].levels = shiftArrayToRight(server.depths[depth.name].levels,left); 
             break;
         }
-    } */
+    }
    
 
     //While today is in the future, keep cycling the marker
