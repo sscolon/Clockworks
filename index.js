@@ -98,6 +98,9 @@ function UpdateSwap(depth){
         server.depths[depth.name].marked = new Date(init);
 
         server.depths[depth.name].ready = true;
+
+        //Swap out the level names for the actual icons
+        server.depths[depth.name].levels = GetIcon(server.depths[depth.name].levels);
     }
 
    
@@ -186,15 +189,27 @@ function SendInfo(depth,level){
    
     var upcoming = GetFuture(depth);
     var channel = bot.channels.get("602110386967150600");
+
+
+    //Combine the arrows and emojis to create a nice looking view of that depth.
+    var cycle = "";
+    for(var i = 0; i < depth.levels.length; i++){
+        cycle += depth.levels[i];
+        cycle += " ";
+        if(i + 1 < depth.levels.length){
+            cycle += images[depth.direction];
+        }
+    }
+
+
     var embed = new Discord.RichEmbed();
     embed.setTitle("Clockworks")
     embed.addField(depth.name + "'s Status", `${depth.name} recently swapped to ${level}`)
-   // embed.addField("Next Level in Queue: " + )
-   embed.addField("Next Level in Queue: ", `${upcoming}`)
+    embed.addField("Next Level in Queue: ", `${upcoming}`)
     embed.addField("Next Marker Swap: ",  depth.marked)
     embed.addField("Next Level Swap:", depth.next)
-    embed.addField("Level Cycle ", `${depth.view}` + " " +  `${depth.levels}`)
-    embed.addField("Marker Position and Pattern: " + depth.marker[depth.selection]," > > > "+ depth.marker)
+    embed.addField("Level Cycle ", `${cycle}`)
+    embed.addField("Marker Position and Pattern: " + depth.marker[depth.selection],depth.marker)
 
     embed.setThumbnail(depth.icon);
 
@@ -212,6 +227,30 @@ function SendInfo(depth,level){
     } 
 }
 
+//Get the icon for this.
+function GetIcon(arr){
+    for(var i = 0; i < arr.length; i++){
+        switch(arr[i]){
+            case 'compound':
+                arr[i] = images.compound;
+            break;
+            case 'tunnels':
+                arr[i] = images.tunnels;
+            break;
+            case 'arena':
+                arr[i] = images.arena;
+            break;
+            case 'wolver':
+                arr[i] = images.wolver;
+            break;
+            case 'decon':
+                arr[i] = images.decon;
+            break;
+        }
+    }
+    return arr;
+}
+
 function GetFuture(depth){
     var temp = depth.selection;
     var first = false;
@@ -224,14 +263,12 @@ function GetFuture(depth){
         if(temp >= depth.marker.length){
             temp = 0;
         }
+        console.log("marker rotating first");
         first = true;
     }
     //If they're at the same time, we want both to happen.
     if(depth.marked === depth.next){
-        temp = depth.selection + 1;
-        if(temp >= depth.marker.length){
-            temp = 0;
-        }
+        console.log("both will happen!")
         same = true;
     }
     
