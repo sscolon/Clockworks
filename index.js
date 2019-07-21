@@ -111,7 +111,7 @@ function UpdateSwap(depth){
 
         //Swap out the level names for the actual icons
         server.depths[depth.name].icons = GetIcon(server.depths[depth.name].levels);
-        server.depths[depth.name].names = GetLevel(server.depths[depth.name].levels);
+        server.depths[depth.name].names = GetNames(server.depths[depth.name].levels);
     }
 
    
@@ -225,15 +225,16 @@ function SendInfo(depth,level){
         }
     }
 
-    var current = depth.names[level];
-    var icon = depth.icons[level];
+    console.log(level);
+    var current = level_names[level];
+    var icon = images[level];
 
     var embed = new Discord.RichEmbed();
     embed.setTitle("Clockworks")
     embed.addField(depth.name + "'s Status", `${depth.name} recently swapped to ${current}  ${icon}`)
     embed.addBlankField();
     embed.addField("Level Cycle ", `${cycle}`)
-    embed.addField("Next Level in Queue: ", `${upcoming}`)
+    embed.addField("Next Level in Queue: ", `${level_names[upcoming]}  ${images[upcoming]}`)
     embed.addBlankField();
     embed.addField("Next Marker Swap: ",  depth.marked)
     embed.addField("Next Level Swap:", depth.next)
