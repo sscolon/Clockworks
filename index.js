@@ -27,12 +27,14 @@ try{
 }
 
 let images = JSON.parse(fs.readFileSync('config/image.json','utf8'));
+let level_names = JSON.parse(fs.readFileSync('config/names.json','utf8'));
 let rotations = JSON.parse(fs.readFileSync('config/depth.json','utf8'));
 
 setInterval(function() {
     Update();
 }, 5000);
 
+//Check for updates, this is called every 5 seconds.
 function Update(){
     ////console.log("Updating");
     for(var key in rotations){
@@ -46,6 +48,8 @@ function Update(){
         
     }
 }
+
+//Instance a new depth for cycling.
 function Instance(depth){
     if(!server.depths[rotations[depth].name]){
         server.depths[rotations[depth].name] = {};
@@ -54,6 +58,8 @@ function Instance(depth){
         //console.log("New Depth!");
     }
 }
+
+//Get the date that that depth was recorded
 function SetDate(depth){
     var initialize = new Date();
 
@@ -67,6 +73,8 @@ function SetDate(depth){
    // //console.log("Init " + initialize);
     return initialize;
 }
+
+//Get today's date, this was for testing purposes
 function GetDate(seconds = 0, timezone = 0){
  
     var date = new Date();
@@ -78,13 +86,15 @@ function GetDate(seconds = 0, timezone = 0){
     return newDate.toLocaleString();
 
 }
-//Getting the next rotation
+//Offset Date
 function OffsetDate(init, offset){
     var nextDate = new Date(init);
     nextDate.setSeconds(init.getSeconds() + offset);
     return nextDate;
 }
 
+
+//Update the swap of a Depth
 function UpdateSwap(depth){
     //Store this data in another json
     var instance = false;
@@ -100,7 +110,8 @@ function UpdateSwap(depth){
         server.depths[depth.name].ready = true;
 
         //Swap out the level names for the actual icons
-        server.depths[depth.name].levels = GetIcon(server.depths[depth.name].levels);
+        server.depths[depth.name].icons = GetIcon(server.depths[depth.name].levels);
+        server.depths[depth.name].names = GetLevel(server.depths[depth.name].levels);
     }
 
    
@@ -142,7 +153,16 @@ function UpdateSwap(depth){
     if(instance){
         //Something is causing it to shift 1 too many times, so we have to shift back.
         //console.log("Shift Back");
-        server.depths[depth.name].levels = shiftArrayToRight(server.depths[depth.name].levels,right); 
+        switch(server.depths[depth.name].direction){
+            case 'left':
+                server.depths[depth.name].levels = shiftArrayToRight(server.depths[depth.name].levels,right); 
+                ////console.log(server.depths[depth.name].levels);
+                //console.log("Swap to the left " + server.depths[depth.name].levels);
+            break;
+            case 'right':
+                server.depths[depth.name].levels = shiftArrayToRight(server.depths[depth.name].levels,left); 
+            break;
+        }
     }
    
 
@@ -163,9 +183,7 @@ function UpdateSwap(depth){
             server.depths[depth.name].selection = server.depths[depth.name].marker.length - 1;
         }
 
-        //Make sure the future depth is right
-
-         //Offset the date by the rotation time
+        //Offset the date by the rotation time
         server.depths[depth.name].marked = OffsetDate(server.depths[depth.name].marked,depth.markerrotation)
         updated = true;
     }
@@ -179,12 +197,18 @@ function UpdateSwap(depth){
     SaveData();
 }
 
+
+//Shifting array for Marker and Level Cycles
+//Moving the length of the array minus 1 is the same as 1 to the left.
 function shiftArrayToRight(arr, places) {
     for (var i = 0; i < places; i++) {
         arr.unshift(arr.pop());
     }
     return arr;
 }
+
+
+//Send out the info to the channel
 function SendInfo(depth,level){
    
     var upcoming = GetFuture(depth);
@@ -193,22 +217,26 @@ function SendInfo(depth,level){
 
     //Combine the arrows and emojis to create a nice looking view of that depth.
     var cycle = "";
-    for(var i = 0; i < depth.levels.length; i++){
-        cycle += depth.levels[i];
+    for(var i = 0; i < depth.icons.length; i++){
+        cycle += depth.icons[i];
         cycle += " ";
-        if(i + 1 < depth.levels.length){
+        if(i + 1 < depth.icons.length){
             cycle += images[depth.direction];
         }
     }
 
+    var current = depth.names[level];
+    var icon = depth.icons[level];
 
     var embed = new Discord.RichEmbed();
     embed.setTitle("Clockworks")
-    embed.addField(depth.name + "'s Status", `${depth.name} recently swapped to ${level}`)
+    embed.addField(depth.name + "'s Status", `${depth.name} recently swapped to ${current}  ${icon}`)
+    embed.addBlankField();
+    embed.addField("Level Cycle ", `${cycle}`)
     embed.addField("Next Level in Queue: ", `${upcoming}`)
+    embed.addBlankField();
     embed.addField("Next Marker Swap: ",  depth.marked)
     embed.addField("Next Level Swap:", depth.next)
-    embed.addField("Level Cycle ", `${cycle}`)
     embed.addField("Marker Position and Pattern: " + depth.marker[depth.selection],depth.marker)
 
     embed.setThumbnail(depth.icon);
@@ -229,28 +257,32 @@ function SendInfo(depth,level){
 
 //Get the icon for this.
 function GetIcon(arr){
+    var icons = Array.from(arr);
     for(var i = 0; i < arr.length; i++){
-        switch(arr[i]){
-            case 'compound':
-                arr[i] = images.compound;
-            break;
-            case 'tunnels':
-                arr[i] = images.tunnels;
-            break;
-            case 'arena':
-                arr[i] = images.arena;
-            break;
-            case 'wolver':
-                arr[i] = images.wolver;
-            break;
-            case 'decon':
-                arr[i] = images.decon;
-            break;
+        for (var key in images){
+            if(icons[i] === key){
+                icons[i] = images[key];
+            }
         }
     }
-    return arr;
+    return icons;
 }
 
+//Get Level Names
+function GetNames(arr){
+    var names = Array.from(arr);
+    for(var i = 0; i < arr.length; i++){
+        for (var key in level_names){
+            if(names[i] === key){
+                names[i] = level_names[key];
+            }
+        }
+    }
+    return names;
+}
+
+
+//Getting the future level
 function GetFuture(depth){
     var temp = depth.selection;
     var first = false;
@@ -266,8 +298,20 @@ function GetFuture(depth){
         console.log("marker rotating first");
         first = true;
     }
+
+    //Debugging
+    console.log(depth.name + "  " + depth.marked);
+    console.log(depth.name + "  " + depth.next);
+    console.log(depth.name + " subtraction " + (depth.marked - depth.next));
+
+    var diff = depth.marked - depth.next;
+
     //If they're at the same time, we want both to happen.
-    if(depth.marked === depth.next){
+    if(diff === 0){
+        temp = depth.selection + 1;
+        if(temp >= depth.marker.length){
+            temp = 0;
+        }
         console.log("both will happen!")
         same = true;
     }
@@ -279,12 +323,15 @@ function GetFuture(depth){
     var future = Array.from(depth.levels);
   
     //Depth rotating first
-    if(first === false && same == false){
+    if(first === false || same === true){
+        
         switch(depth.direction){
             case 'left':
+                console.log(depth.name + " will shift to the left");
                 future = shiftArrayToRight(future,depth.levels.length - 1);
             break;
             case 'right':
+                console.log(depth.name + " will shift to the right");
                 future = shiftArrayToRight(future,1);
             break;
         }
@@ -323,6 +370,8 @@ function GetFuture(depth){
     }
     return level;
 }
+
+//Getting the current level
 function GetLevel(depth){
     //What position the marker is in.
     var pos = depth.marker[depth.selection];
@@ -358,6 +407,7 @@ function GetLevel(depth){
 }
 
 
+//Validating and Saving Data
 function Validate(json){
     try {
     //Stringify the json and then attempt to Parse it.  If the parse fails we won't save the data and should neglect all changes made.
@@ -381,14 +431,16 @@ function SaveData(){
     }
 }
 
-//#endregion
-
 bot.on('ready', () => {
     console.log("Ready to go!");
 })
+
+//This is ran everytime a message is edited
 bot.on('messageUpdate', message =>{
     SaveData();
  })
+
+ //This is ran every message
 bot.on('message', message=> { 
     if(message.channel.type === "dm"){
         return;
@@ -402,12 +454,24 @@ bot.on('message', message=> {
     //Commands - Disabled
     if(message.content.startsWith(prefix)){
         //Arguments
-        if(gm){
+        if(powerful){
             switch(args[0]){
                 case 'clear':
+                    var mychannel = bot.channels.get("602110386967150600");
+                    for(var key in server.depths){
+                        try {
+                            mychannel.fetchMessage(server.depths[key].id).then (sentEmbed => {
+                                sentEmbed.delete();
+                            });
+                        } catch(e){
+                            console.log("message doesn't exist");
+                        }
+                        
+                    }
                     server = {};
                     server.depths = {};
                     SaveData();
+                    Update();
                     //console.log("Data Cleared");
                 break;
                 case 'update':

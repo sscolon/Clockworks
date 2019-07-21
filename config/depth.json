@@ -19,6 +19,26 @@
     
         "rotation":900,
         "markerrotation":450
+    },"Golden Falcon D9":{
+        "name":"Golden Falcon D9",
+        "levels":["shrine","shrine"],
+        "direction":"left",
+        "icon":"https://i.imgur.com/E9qvfag.png",
+    
+        "year":2019,
+        "month":6,
+        "day":21,
+        "hour":14,
+        "minute":43,
+        "second":30,
+    
+        "marker":["far right","far left"],
+        "selection":0,
+    
+        "level":0,
+    
+        "rotation":180,
+        "markerrotation":90
     },"Golden Falcon D11":{
         "name":"Golden Falcon D11",
         "levels":["compound","arena","arena"],
@@ -41,7 +61,7 @@
         "markerrotation":105
     },"Golden Falcon D14":{
         "name":"Golden Falcon D14",
-        "levels":["arena","arena","tunnels"],
+        "levels":["arena","tunnels","arena"],
         "direction":"right",
         "icon":"https://i.imgur.com/E9qvfag.png",
     
@@ -61,7 +81,7 @@
         "markerrotation":450  
     },"Golden Falcon D19":{
         "name":"Golden Falcon D19",
-        "levels":["decon","arena"],
+        "levels":["arena","decon"],
         "direction":"left",
         "icon":"https://i.imgur.com/E9qvfag.png",
     
