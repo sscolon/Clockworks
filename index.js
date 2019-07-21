@@ -136,7 +136,7 @@ function UpdateSwap(depth){
         switch(server.depths[depth.name].direction){
             case 'left':
                 server.depths[depth.name].levels = shiftArrayToRight(server.depths[depth.name].levels,left); 
-                ////console.log(server.depths[depth.name].levels);
+                console.log(server.depths[depth.name].levels);
                 //console.log("Swap to the left " + server.depths[depth.name].levels);
             break;
             case 'right':
@@ -215,6 +215,7 @@ function SendInfo(depth,level){
     var channel = bot.channels.get("602110386967150600");
 
 
+    depth.icons = GetIcon(depth.levels);
     //Combine the arrows and emojis to create a nice looking view of that depth.
     var cycle = "";
     for(var i = 0; i < depth.icons.length; i++){

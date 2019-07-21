@@ -32,7 +32,7 @@
         "minute":43,
         "second":30,
     
-        "marker":["far right","far left"],
+        "marker":["far left","far right"],
         "selection":0,
     
         "level":0,
