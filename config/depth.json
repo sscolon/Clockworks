@@ -1,7 +1,7 @@
 {"Emerald Phantom D9":
     {
         "name":"Emerald Phantom D9",
-        "levels":["tunnels","wolver","compound"],
+        "levels":["wolver","compound","tunnels"],
         "direction":"left",
         "icon":"https://i.imgur.com/1BcvRvb.png",
 
@@ -41,7 +41,7 @@
         "markerrotation":90
     },"Golden Falcon D11":{
         "name":"Golden Falcon D11",
-        "levels":["arena","compound","arena"],
+        "levels":["compound","arena","arena"],
         "direction":"left",
         "icon":"https://i.imgur.com/E9qvfag.png",
     
@@ -61,7 +61,7 @@
         "markerrotation":105
     },"Golden Falcon D14":{
         "name":"Golden Falcon D14",
-        "levels":["arena","arena","tunnels"],
+        "levels":["arena","tunnels","arena"],
         "direction":"right",
         "icon":"https://i.imgur.com/E9qvfag.png",
     
@@ -81,7 +81,7 @@
         "markerrotation":450  
     },"Golden Falcon D19":{
         "name":"Golden Falcon D19",
-        "levels":["decon","arena"],
+        "levels":["arena","decon"],
         "direction":"left",
         "icon":"https://i.imgur.com/E9qvfag.png",
     
