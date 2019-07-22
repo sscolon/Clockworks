@@ -25,5 +25,13 @@
 "five middle left":"<:numeral_2:602902321109663745>",
 "five middle":"<:numeral_3:602902321042817035>",
 "five middle right":"<:numeral_4:602902321277435905>",
-"five right":"<:numeral_5:602902321760043034>"
+"five right":"<:numeral_5:602902321760043034>",
+
+"selected_1":"<:numeral_1_selected:602911430533971997>",
+"selected_2":"<:numeral_2_selected:602911431482015754>",
+"selected_3":"<:numeral_3_selected:602911431519764494>",
+"selected_4":"<:numeral_4_selected:602911431507312650>",
+"selected_5":"<:numeral_5_selected:602911431452786689>",
+
+"next_up":"<:next_up:602918928670392346>"
 }

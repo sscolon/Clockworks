@@ -136,7 +136,7 @@ function UpdateSwap(depth){
         switch(server.depths[depth.name].direction){
             case 'left':
                 server.depths[depth.name].levels = shiftArrayToRight(server.depths[depth.name].levels,left); 
-                console.log(server.depths[depth.name].levels);
+                //console.log(server.depths[depth.name].levels);
                 //console.log("Swap to the left " + server.depths[depth.name].levels);
             break;
             case 'right':
@@ -216,6 +216,7 @@ function SendInfo(depth,level){
 
 
     depth.icons = GetIcon(depth.levels);
+    depth.markers = GetIcon(depth.marker);
     //Combine the arrows and emojis to create a nice looking view of that depth.
     var cycle = "";
     for(var i = 0; i < depth.icons.length; i++){
@@ -227,30 +228,71 @@ function SendInfo(depth,level){
     }
 
     var marker_cycle = "";
-    for(var i = 0; i < depth.marker.length; i++){
-        marker_cycle += images[depth.marker];
+    var marker_pos = depth.markers[depth.selection];
+
+    for(var j = 0; j < depth.markers.length; j++){
+
+        //Make the icon green if it's the chosen one.
+        if(marker_pos === depth.markers[j]){
+            switch(marker_pos){
+                case '<:numeral_1:602902321256595476>':
+                    marker_pos = "<:numeral_1_selected:602911430533971997>";
+                break;
+                case '<:numeral_2:602902321109663745>':
+                    marker_pos = "<:numeral_2_selected:602911431482015754>";
+                break;
+                case '<:numeral_3:602902321042817035>':
+                    marker_pos = "<:numeral_3_selected:602911431519764494>";
+                break;
+                case '<:numeral_4:602902321277435905>':
+                    marker_pos = "<:numeral_4_selected:602911431507312650>";
+                break;
+                case '<:numeral_5:602902321760043034>':
+                    marker_pos = "<:numeral_5_selected:602911431452786689>"
+                break;
+            }
+
+            marker_cycle += marker_pos;
+        } else {
+            marker_cycle += depth.markers[j];
+        }
+
+      
         marker_cycle += " ";
-        if(i + 1 < depth.marker.length){
+        if(j + 1 < depth.markers.length){
             marker_cycle += images["right"];
         }
     }
+
+    //Future Level
+    marker_cycle += images.next_up; 
+    marker_cycle += " ";
+    marker_cycle += upcoming;
 
     console.log(level);
     var current = level_names[level];
     var icon = images[level];
 
+
+    //Create the embed
     var embed = new Discord.RichEmbed();
     embed.setTitle("Clockworks")
     embed.addField(depth.name + "'s Status", `${depth.name} recently swapped to ${current}  ${icon}`)
     embed.addBlankField();
-    embed.addField("Level Cycle ", `${cycle}`)
+
+    //Level Cycle and Upcoming
     embed.addField("Marker Cycle: ", `${marker_cycle}`)
-    embed.addField("Next Level in Queue: ", `${level_names[upcoming]}  ${images[upcoming]}`)
+    embed.addField("Level Cycle ", `${cycle}`)
+    
+    //Next Level
+
     embed.addBlankField();
+
+    //Technical Information
     embed.addField("Next Marker Swap: ",  depth.marked)
     embed.addField("Next Level Swap:", depth.next)
     
-
+    //Set the icon
     embed.setThumbnail(depth.icon);
 
     //Try to edit previous message, if you can't do that, create a new one.
@@ -266,6 +308,7 @@ function SendInfo(depth,level){
         });
     } 
 }
+
 
 //Get the icon for this.
 function GetIcon(arr){
@@ -312,9 +355,9 @@ function GetFuture(depth){
     }
 
     //Debugging
-    console.log(depth.name + "  " + depth.marked);
-    console.log(depth.name + "  " + depth.next);
-    console.log(depth.name + " subtraction " + (depth.marked - depth.next));
+    //console.log(depth.name + "  " + depth.marked);
+    //console.log(depth.name + "  " + depth.next);
+    //console.log(depth.name + " subtraction " + (depth.marked - depth.next));
 
     var diff = depth.marked - depth.next;
 
@@ -354,12 +397,17 @@ function GetFuture(depth){
     var level;
 
     switch(pos){
-        case 'far right':
-            level = future[future.length - 1];
-            //console.log(future[future.length - 1]);
-        break;
-        case 'far left':
+        case 'two left':
             level = future[0];
+        break;
+        case 'two right':
+            level = future[1];
+        break;
+        case 'three left':
+            level = future[0];
+        break;
+        case 'three right':
+            level = future[future.length - 1];
         break;
         case 'three middle':
             level = future[1];
@@ -371,6 +419,21 @@ function GetFuture(depth){
             level = future[1];
         break;
         case 'four middle right':
+            level = future[2];
+        break;
+        case 'four right':
+            level =  future[future.length - 1];
+        break;
+        case 'four left':
+            level = future[0];
+        break;
+        case 'five right':
+            level =  future[future.length - 1];
+        break;
+        case 'five left':
+            level = future[0];
+        break;
+        case 'five middle':
             level = future[2];
         break;
         case 'five middle left':
@@ -387,6 +450,7 @@ function GetFuture(depth){
 function GetLevel(depth){
     //What position the marker is in.
     var pos = depth.marker[depth.selection];
+    console.log(pos);
     var level;
     //console.log("Get Level " + depth.levels);
     switch(pos){
