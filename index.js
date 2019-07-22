@@ -267,7 +267,7 @@ function SendInfo(depth,level){
     //Future Level
     cycle += images.next_up; 
     cycle += " ";
-    cycle += images[upcoming];
+    cycle += level_names[upcoming] + " " + images[upcoming];
 
     console.log(level);
     var current = level_names[level];
