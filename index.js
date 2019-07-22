@@ -226,6 +226,15 @@ function SendInfo(depth,level){
         }
     }
 
+    var marker_cycle = "";
+    for(var i = 0; i < depth.marker.length; i++){
+        marker_cycle += images[depth.marker];
+        marker_cycle += " ";
+        if(i + 1 < depth.marker.length){
+            marker_cycle += images["right"];
+        }
+    }
+
     console.log(level);
     var current = level_names[level];
     var icon = images[level];
@@ -235,11 +244,12 @@ function SendInfo(depth,level){
     embed.addField(depth.name + "'s Status", `${depth.name} recently swapped to ${current}  ${icon}`)
     embed.addBlankField();
     embed.addField("Level Cycle ", `${cycle}`)
+    embed.addField("Marker Cycle: ", `${marker_cycle}`)
     embed.addField("Next Level in Queue: ", `${level_names[upcoming]}  ${images[upcoming]}`)
     embed.addBlankField();
     embed.addField("Next Marker Swap: ",  depth.marked)
     embed.addField("Next Level Swap:", depth.next)
-    embed.addField("Marker Position and Pattern: " + depth.marker[depth.selection],depth.marker)
+    
 
     embed.setThumbnail(depth.icon);
 
@@ -380,11 +390,17 @@ function GetLevel(depth){
     var level;
     //console.log("Get Level " + depth.levels);
     switch(pos){
-        case 'far right':
-            level = depth.levels[depth.levels.length - 1];
-        break;
-        case 'far left':
+        case 'two left':
             level = depth.levels[0];
+        break;
+        case 'two right':
+            level = depth.levels[1];
+        break;
+        case 'three left':
+            level = depth.levels[0];
+        break;
+        case 'three right':
+            level = depth.levels[depth.levels.length - 1];
         break;
         case 'three middle':
             level = depth.levels[1];
@@ -396,6 +412,21 @@ function GetLevel(depth){
             level = depth.levels[1];
         break;
         case 'four middle right':
+            level = depth.levels[2];
+        break;
+        case 'four right':
+            level =  depth.levels[depth.levels.length - 1];
+        break;
+        case 'four left':
+            level = depth.levels[0];
+        break;
+        case 'five right':
+            level =  depth.levels[depth.levels.length - 1];
+        break;
+        case 'five left':
+            level = depth.levels[0];
+        break;
+        case 'five middle':
             level = depth.levels[2];
         break;
         case 'five middle left':

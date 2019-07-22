@@ -3,7 +3,27 @@
 "arena":"<:arena:602493118276829203>",
 "wolver":"<:wolver:602494071625482245>",
 "decon":"<:decon:602496725055307776>",
+"drudgery":"<:drudgery:602899595797725185>",
 "shrine":"<:shrine:602512999286308884>",
 "shrine 2":"<:shrine:602512999286308884>",
 "left":"<:spacer_left:602497265067884545>",
-"right":"<:spacer_right:602497265327931403>"}
+"right":"<:spacer_right:602497265327931403>",
+
+"two left":"<:numeral_1:602902321256595476>",
+"two right":"<:numeral_2:602902321109663745>",
+
+"three left":"<:numeral_1:602902321256595476>",
+"three middle":"<:numeral_2:602902321109663745>",
+"three right":"<:numeral_3:602902321042817035>",
+
+"four left":"<:numeral_1:602902321256595476>",
+"four middle left":"<:numeral_2:602902321109663745>",
+"four middle right":"<:numeral_3:602902321042817035>",
+"four right":"<:numeral_4:602902321277435905>",
+
+"five left":"<:numeral_1:602902321256595476>",
+"five middle left":"<:numeral_2:602902321109663745>",
+"five middle":"<:numeral_3:602902321042817035>",
+"five middle right":"<:numeral_4:602902321277435905>",
+"five right":"<:numeral_5:602902321760043034>"
+}
