@@ -265,9 +265,9 @@ function SendInfo(depth,level){
     }
 
     //Future Level
-    marker_cycle += images.next_up; 
-    marker_cycle += " ";
-    marker_cycle += upcoming;
+    cycle += images.next_up; 
+    cycle += " ";
+    cycle += images[upcoming];
 
     console.log(level);
     var current = level_names[level];
