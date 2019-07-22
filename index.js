@@ -232,7 +232,6 @@ function SendInfo(depth,level){
 
     for(var j = 0; j < depth.markers.length; j++){
 
-        //Make the icon green if it's the chosen one.
         if(marker_pos === depth.markers[j]){
             switch(marker_pos){
                 case '<:numeral_1:602902321256595476>':
@@ -264,35 +263,24 @@ function SendInfo(depth,level){
         }
     }
 
-    //Future Level
-    cycle += images.next_up; 
-    cycle += " ";
-    cycle += level_names[upcoming] + " " + images[upcoming];
-
     console.log(level);
     var current = level_names[level];
     var icon = images[level];
 
-
-    //Create the embed
     var embed = new Discord.RichEmbed();
     embed.setTitle("Clockworks")
     embed.addField(depth.name + "'s Status", `${depth.name} recently swapped to ${current}  ${icon}`)
     embed.addBlankField();
 
-    //Level Cycle and Upcoming
     embed.addField("Marker Cycle: ", `${marker_cycle}`)
     embed.addField("Level Cycle ", `${cycle}`)
     
-    //Next Level
-
+    embed.addField("Next Level in Queue: ", `${level_names[upcoming]}  ${images[upcoming]}`)
     embed.addBlankField();
-
-    //Technical Information
     embed.addField("Next Marker Swap: ",  depth.marked)
     embed.addField("Next Level Swap:", depth.next)
     
-    //Set the icon
+
     embed.setThumbnail(depth.icon);
 
     //Try to edit previous message, if you can't do that, create a new one.
