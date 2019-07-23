@@ -17,8 +17,10 @@
     
         "level":0,
     
-        "rotation":900,
-        "markerrotation":450
+        "rotation":[900],
+        "rotation_index":0,
+        "markerrotation":[450],
+        "marker_index":0
     },"Golden Falcon D9":{
         "name":"Golden Falcon D9",
         "levels":["shrine","shrine 2"],
@@ -37,8 +39,32 @@
     
         "level":0,
     
-        "rotation":180,
-        "markerrotation":90
+        "rotation":[180],
+        "rotation_index":0,
+        "markerrotation":[90],
+        "marker_index":0
+    },"Golden Falcon D10":{
+        "name":"Golden Falcon D10",
+        "levels":["shrine 4","shrine 3"],
+        "direction":"right",
+        "icon":"https://i.imgur.com/E9qvfag.png",
+    
+        "year":2019,
+        "month":6,
+        "day":21,
+        "hour":18,
+        "minute":0,
+        "second":0,
+    
+        "marker":["two left","two right"],
+        "selection":0,
+    
+        "level":0,
+    
+        "rotation":[90,180,225],
+        "rotation_index":0,
+        "markerrotation":[135,90,45,45,90,45,45,90,45,45,90],
+        "marker_index":0
     },"Golden Falcon D11":{
         "name":"Golden Falcon D11",
         "levels":["compound","arena","arena"],
@@ -57,8 +83,10 @@
     
         "level":0,
     
-        "rotation":900,
-        "markerrotation":105
+        "rotation":[900],
+        "rotation_index":0,
+        "markerrotation":[105],
+        "marker_index":0
     },"Golden Falcon D14":{
         "name":"Golden Falcon D14",
         "levels":["arena","tunnels","arena"],
@@ -77,8 +105,10 @@
     
         "level":0,
     
-        "rotation":900,
-        "markerrotation":450  
+        "rotation":[900],
+        "rotation_index":0,
+        "markerrotation":[450],
+        "marker_index":0  
     },"Golden Falcon D19":{
         "name":"Golden Falcon D19",
         "levels":["arena","decon"],
@@ -97,8 +127,10 @@
     
         "level":0,
     
-        "rotation":900,
-        "markerrotation":450  
+        "rotation":[900],
+        "rotation_index":0,
+        "markerrotation":[450],
+        "marker_index":0
     },"Amber Knight D9":{
         "name":"Amber Knight D9",
         "levels":["drudgery","tunnels","compound","compound"],
@@ -117,7 +149,9 @@
     
         "level":0,
     
-        "rotation":900,
-        "markerrotation":450
+        "rotation":[900],
+        "rotation_index":0,
+        "markerrotation":[450],
+        "marker_index":0
     }
 }

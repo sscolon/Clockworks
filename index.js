@@ -144,8 +144,13 @@ function UpdateSwap(depth){
             break;
         }
 
-        server.depths[depth.name].next = OffsetDate(server.depths[depth.name].next,depth.rotation);
-       
+        if(server.depths[depth.name].rotation_index >= depth.rotation.length){
+            server.depths[depth.name].rotation_index = 0;
+        }
+        server.depths[depth.name].next = OffsetDate(server.depths[depth.name].next,depth.rotation[server.depths[depth.name].rotation_index]);
+
+        server.depths[depth.name].rotation_index += 1;
+        
         updated = true;
     }
 
@@ -183,8 +188,14 @@ function UpdateSwap(depth){
             server.depths[depth.name].selection = server.depths[depth.name].marker.length - 1;
         }
 
+        if(server.depths[depth.name].marker_index >= depth.markerrotation.length){
+            server.depths[depth.name].marker_index = 0;
+        }
         //Offset the date by the rotation time
-        server.depths[depth.name].marked = OffsetDate(server.depths[depth.name].marked,depth.markerrotation)
+        server.depths[depth.name].marked = OffsetDate(server.depths[depth.name].marked,depth.markerrotation[server.depths[depth.name].marker_index])
+        server.depths[depth.name].marker_index += 1;
+       
+        
         updated = true;
     }
     
