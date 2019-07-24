@@ -12,6 +12,9 @@
         "minute":30,
         "second":0,
     
+        "marker_hour":19,
+        "marker_minute":10,
+        "marker_second":30,
         "marker":["three left","three right"],
         "selection":0,
     
@@ -73,7 +76,7 @@
         "marker_index":0
     },"Golden Falcon D11":{
         "name":"Golden Falcon D11",
-        "levels":["compound","arena","arena"],
+        "levels":["arena","arena","compound"],
         "direction":"left",
         "icon":"https://i.imgur.com/E9qvfag.png",
     
@@ -87,7 +90,7 @@
         "marker_hour":15,
         "marker_minute":15,
         "marker_second":45,
-        "marker":["three middle","three right","three left"],
+        "marker":["three left","three middle","three right"],
         "selection":0,
     
         "level":0,

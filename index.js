@@ -110,6 +110,8 @@ function WithinBounds(arr,val){
     if(val < 0){
         val = arr.length - 1;
     }
+    var check = val;
+    return check;
 }
 //Update the swap of a Depth
 function UpdateSwap(depth){
@@ -134,8 +136,8 @@ function UpdateSwap(depth){
 
         //Initial Offsets
         //We don't want it to swap levels when initializing, so we offset right here.
-        myDepth.next = OffsetDate(init,depth.rotation[myDepth.rotation_index]);
-        myDepth.marked = OffsetDate(init_marker,depth.markerrotation[myDepth.marker_index])
+        myDepth.next = OffsetDate(myDepth.next,depth.rotation[myDepth.rotation_index]);
+        myDepth.marked = OffsetDate(myDepth.marked,depth.markerrotation[myDepth.marker_index])
     }
 
    
@@ -150,7 +152,6 @@ function UpdateSwap(depth){
     var right = 1;
 
     while(currentDate >= myDepth.next){
-
         //Swap Left or Right
         switch(myDepth.direction){
             case 'left':
@@ -161,22 +162,18 @@ function UpdateSwap(depth){
             break;
         }
 
-        //Making sure the number is within the array;
-        WithinBounds(depth.rotation,myDepth.rotation_index);
         //Offset Date
         myDepth.next = OffsetDate(myDepth.next,depth.rotation[myDepth.rotation_index]);
         //Next in the array
         myDepth.rotation_index += 1;
+        //Making sure the number is within the array;
+        myDepth.rotation_index = WithinBounds(depth.rotation,myDepth.rotation_index);
         
         updated = true;
     }
 
     //While today is in the future, keep cycling the marker
     while(currentDate >= myDepth.marked){
-        //Make sure the index doesn't go further than the array.
-        WithinBounds(depth.marker,myDepth.selection);
-        WithinBounds(depth.markerrotation,myDepth.marker_index);
-
         //Offset the date by the rotation time
         myDepth.marked = OffsetDate(myDepth.marked,depth.markerrotation[myDepth.marker_index])
   
@@ -184,6 +181,10 @@ function UpdateSwap(depth){
         myDepth.selection += 1;
         myDepth.marker_index += 1;
         
+             //Make sure the index doesn't go further than the array.
+        myDepth.selection = WithinBounds(depth.marker,myDepth.selection);
+        myDepth.marker_index = WithinBounds(depth.markerrotation,myDepth.marker_index);
+
         updated = true;
     }
     
@@ -510,8 +511,10 @@ function SaveData(){
 }
 //Logging Updates
 function Log(msg){
-    var mychannel = bot.channels.get("603378159060123712");
-    mychannel.send(msg);
+    if(server.log){
+        var mychannel = bot.channels.get("603378159060123712");
+        mychannel.send(msg);
+    }
 }
 
 bot.on('ready', () => {
@@ -553,6 +556,7 @@ bot.on('message', message=> {
                     }
                     server = {};
                     server.depths = {};
+                    server.log = false;
                     SaveData();
                     Update();
                     //console.log("Data Cleared");
@@ -563,7 +567,23 @@ bot.on('message', message=> {
                 case 'date':
                     message.channel.send(GetDate());
                 break;
+                case 'enable':
+                    switch (args[1]){
+                        case 'log':
+                            server.log = !server.log;
+                            message.reply("Gate Log was set to " + server.log);
+                        break;
+                    }           
+                break;
             }
+        }
+        //Player Commands
+        switch(args[0]){
+            case 'role':
+               switch(args[1]){
+                    
+               }
+            break; 
         }
         
     }
