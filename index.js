@@ -48,7 +48,6 @@ function Update(){
         
     }
 }
-
 //Instance a new depth for cycling.
 function Instance(depth){
     if(!server.depths[rotations[depth].name]){
@@ -59,21 +58,31 @@ function Instance(depth){
     }
 }
 
+//#region Date Stuff
 //Get the date that that depth was recorded
-function SetDate(depth){
+function SetDate(depth, marker = false){
     var initialize = new Date();
 
     //Sets a specific date, we will add offsets to this date in order to produce a swap time.
-    initialize.setMonth(depth.month);
-    initialize.setDate(depth.day);
-    initialize.setHours(depth.hour);
-    initialize.setMinutes(depth.minute);
-    initialize.setSeconds(depth.second);
+    if(marker === false){
+        initialize.setMonth(depth.month);
+        initialize.setDate(depth.day);
+        initialize.setHours(depth.hour);
+        initialize.setMinutes(depth.minute);
+        initialize.setSeconds(depth.second);
+    
+    } else {
+        initialize.setMonth(depth.month);
+        initialize.setDate(depth.day);
+        initialize.setHours(depth.marker_hour);
+        initialize.setMinutes(depth.marker_minute);
+        initialize.setSeconds(depth.marker_second);
 
+    }
+    
    // //console.log("Init " + initialize);
     return initialize;
 }
-
 //Get today's date, this was for testing purposes
 function GetDate(seconds = 0, timezone = 0){
  
@@ -92,123 +101,101 @@ function OffsetDate(init, offset){
     nextDate.setSeconds(init.getSeconds() + offset);
     return nextDate;
 }
+//#endregion
 
-
+function WithinBounds(arr,val){
+    if(val >= arr.length){
+        val = 0;
+    }
+    if(val < 0){
+        val = arr.length - 1;
+    }
+}
 //Update the swap of a Depth
 function UpdateSwap(depth){
-    //Store this data in another json
-    var instance = false;
-    if(!server.depths[depth.name].ready) {
-        //console.log("I am not ready!.");
+    //Store this data in another variable to make the code look better.
+    var myDepth = server.depths[depth.name];
+
+    if(!myDepth.ready) {
         //Get the inital swap of this depth
         var init = SetDate(depth); 
-        instance = true;
-        //Grab the milliseconds
-        server.depths[depth.name].next = new Date(init);
-        server.depths[depth.name].marked = new Date(init);
+        var init_marker = SetDate(depth,true);
 
-        server.depths[depth.name].ready = true;
+
+        //Create new dates from the instances,
+        myDepth.next = new Date(init);
+        myDepth.marked = new Date(init_marker);
+
+        myDepth.ready = true;
 
         //Swap out the level names for the actual icons
-        server.depths[depth.name].icons = GetIcon(server.depths[depth.name].levels);
-        server.depths[depth.name].names = GetNames(server.depths[depth.name].levels);
+        myDepth.icons = GetIcon(myDepth.levels);
+        myDepth.names = GetNames(myDepth.levels);
+
+        //Initial Offsets
+        //We don't want it to swap levels when initializing, so we offset right here.
+        myDepth.next = OffsetDate(init,depth.rotation[myDepth.rotation_index]);
+        myDepth.marked = OffsetDate(init_marker,depth.markerrotation[myDepth.marker_index])
     }
 
    
     //While today is in the future, keep cycling the level.
     var currentDate = new Date();
-    server.depths[depth.name].next = new Date(server.depths[depth.name].next);
-    server.depths[depth.name].marked = new Date(server.depths[depth.name].marked);
-
-    //Debugging
-   // //console.log("Current Time " + new Date().toLocaleString());
-  //  //console.log("Next Swap " + server.depths[depth.name].next.toLocaleString());
-   // //console.log("Next Marker " + server.depths[depth.name].marked.toLocaleString());
+    myDepth.next = new Date(myDepth.next);
+    myDepth.marked = new Date(myDepth.marked);
 
     var updated = false;
   
-    var left = server.depths[depth.name].levels.length - 1;
+    var left = myDepth.levels.length - 1;
     var right = 1;
 
-    while(currentDate >= server.depths[depth.name].next){
+    while(currentDate >= myDepth.next){
 
         //Swap Left or Right
-        switch(server.depths[depth.name].direction){
+        switch(myDepth.direction){
             case 'left':
-                server.depths[depth.name].levels = shiftArrayToRight(server.depths[depth.name].levels,left); 
-                //console.log(server.depths[depth.name].levels);
-                //console.log("Swap to the left " + server.depths[depth.name].levels);
+                myDepth.levels = shiftArrayToRight(myDepth.levels,left); 
             break;
             case 'right':
-                server.depths[depth.name].levels = shiftArrayToRight(server.depths[depth.name].levels,right); 
+                myDepth.levels = shiftArrayToRight(myDepth.levels,right); 
             break;
         }
 
-        if(server.depths[depth.name].rotation_index >= depth.rotation.length){
-            server.depths[depth.name].rotation_index = 0;
-        }
-        server.depths[depth.name].next = OffsetDate(server.depths[depth.name].next,depth.rotation[server.depths[depth.name].rotation_index]);
-
-        server.depths[depth.name].rotation_index += 1;
+        //Making sure the number is within the array;
+        WithinBounds(depth.rotation,myDepth.rotation_index);
+        //Offset Date
+        myDepth.next = OffsetDate(myDepth.next,depth.rotation[myDepth.rotation_index]);
+        //Next in the array
+        myDepth.rotation_index += 1;
         
         updated = true;
     }
 
-
-    if(instance){
-        //Something is causing it to shift 1 too many times, so we have to shift back.
-        //console.log("Shift Back");
-        switch(server.depths[depth.name].direction){
-            case 'left':
-                server.depths[depth.name].levels = shiftArrayToRight(server.depths[depth.name].levels,right); 
-                ////console.log(server.depths[depth.name].levels);
-                //console.log("Swap to the left " + server.depths[depth.name].levels);
-            break;
-            case 'right':
-                server.depths[depth.name].levels = shiftArrayToRight(server.depths[depth.name].levels,left); 
-            break;
-        }
-    }
-   
-
     //While today is in the future, keep cycling the marker
-    while(currentDate >= server.depths[depth.name].marked){
-        //Update the index
-        server.depths[depth.name].selection += 1;
-
-
+    while(currentDate >= myDepth.marked){
         //Make sure the index doesn't go further than the array.
-        if(server.depths[depth.name].selection >= server.depths[depth.name].marker.length){
+        WithinBounds(depth.marker,myDepth.selection);
+        WithinBounds(depth.markerrotation,myDepth.marker_index);
 
-            server.depths[depth.name].selection = 0;
-        }
-
-        if(server.depths[depth.name].selection < 0){
-          
-            server.depths[depth.name].selection = server.depths[depth.name].marker.length - 1;
-        }
-
-        if(server.depths[depth.name].marker_index >= depth.markerrotation.length){
-            server.depths[depth.name].marker_index = 0;
-        }
         //Offset the date by the rotation time
-        server.depths[depth.name].marked = OffsetDate(server.depths[depth.name].marked,depth.markerrotation[server.depths[depth.name].marker_index])
-        server.depths[depth.name].marker_index += 1;
-       
+        myDepth.marked = OffsetDate(myDepth.marked,depth.markerrotation[myDepth.marker_index])
+  
+        //Move to the next in the array
+        myDepth.selection += 1;
+        myDepth.marker_index += 1;
         
         updated = true;
     }
     
     if(updated){
         //console.log(server.depths[depth.name].levels);
-        var level = GetLevel(server.depths[depth.name]);
-        SendInfo(server.depths[depth.name],level);
+        var level = GetLevel(myDepth);
+        SendInfo(myDepth,level);
     }
-    
+
+    server.depths[depth.name] = myDepth;
     SaveData();
 }
-
-
 //Shifting array for Marker and Level Cycles
 //Moving the length of the array minus 1 is the same as 1 to the left.
 function shiftArrayToRight(arr, places) {
@@ -217,7 +204,6 @@ function shiftArrayToRight(arr, places) {
     }
     return arr;
 }
-
 
 //Send out the info to the channel
 function SendInfo(depth,level){
@@ -281,6 +267,8 @@ function SendInfo(depth,level){
     var embed = new Discord.RichEmbed();
     embed.setTitle("Clockworks")
     embed.addField(depth.name + "'s Status", `${depth.name} recently swapped to ${current}  ${icon}`)
+    Log(`${depth.name} is now on ${current}  ${icon}`);
+    
     embed.addBlankField();
 
     embed.addField("Marker Cycle: ", `${marker_cycle}`)
@@ -307,34 +295,6 @@ function SendInfo(depth,level){
         });
     } 
 }
-
-
-//Get the icon for this.
-function GetIcon(arr){
-    var icons = Array.from(arr);
-    for(var i = 0; i < arr.length; i++){
-        for (var key in images){
-            if(icons[i] === key){
-                icons[i] = images[key];
-            }
-        }
-    }
-    return icons;
-}
-
-//Get Level Names
-function GetNames(arr){
-    var names = Array.from(arr);
-    for(var i = 0; i < arr.length; i++){
-        for (var key in level_names){
-            if(names[i] === key){
-                names[i] = level_names[key];
-            }
-        }
-    }
-    return names;
-}
-
 
 //Getting the future level
 function GetFuture(depth){
@@ -444,7 +404,6 @@ function GetFuture(depth){
     }
     return level;
 }
-
 //Getting the current level
 function GetLevel(depth){
     //What position the marker is in.
@@ -501,7 +460,30 @@ function GetLevel(depth){
     }
     return level;
 }
-
+//Get the icon for this.
+function GetIcon(arr){
+    var icons = Array.from(arr);
+    for(var i = 0; i < arr.length; i++){
+        for (var key in images){
+            if(icons[i] === key){
+                icons[i] = images[key];
+            }
+        }
+    }
+    return icons;
+}
+//Get Level Names
+function GetNames(arr){
+    var names = Array.from(arr);
+    for(var i = 0; i < arr.length; i++){
+        for (var key in level_names){
+            if(names[i] === key){
+                names[i] = level_names[key];
+            }
+        }
+    }
+    return names;
+}
 
 //Validating and Saving Data
 function Validate(json){
@@ -525,6 +507,11 @@ function SaveData(){
             if (err) console.error(err);
         })   
     }
+}
+//Logging Updates
+function Log(msg){
+    var mychannel = bot.channels.get("603378159060123712");
+    mychannel.send(msg);
 }
 
 bot.on('ready', () => {
