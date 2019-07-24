@@ -155,7 +155,7 @@
         "marker_index":0
     },"Aurora Isles":{
         "name":"Aurora Isles",
-        "levels":["jelly2","garden","stone","jelly1"],
+        "levels":["stone grove","jelly farm","jelly farm II","low gardens"],
         "direction":"left",
         "icon":"https://i.imgur.com/dcyv6uU.png",
     
@@ -163,10 +163,10 @@
         "month":6,
         "day":23,
         "hour":16,
-        "minute":31,
+        "minute":52,
         "second":30,
     
-        "marker":["four left","four right"],
+        "marker":["four right","four left"],
         "selection":0,
     
         "level":0,
