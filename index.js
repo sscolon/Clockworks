@@ -48,7 +48,6 @@ function Update(){
         
     }
 }
-
 //Instance a new depth for cycling.
 function Instance(depth){
     if(!server.depths[rotations[depth].name]){
@@ -59,6 +58,7 @@ function Instance(depth){
     }
 }
 
+//#region Date Stuff
 //Get the date that that depth was recorded
 function SetDate(depth){
     var initialize = new Date();
@@ -73,7 +73,6 @@ function SetDate(depth){
    // //console.log("Init " + initialize);
     return initialize;
 }
-
 //Get today's date, this was for testing purposes
 function GetDate(seconds = 0, timezone = 0){
  
@@ -92,7 +91,7 @@ function OffsetDate(init, offset){
     nextDate.setSeconds(init.getSeconds() + offset);
     return nextDate;
 }
-
+//#endregion
 
 //Update the swap of a Depth
 function UpdateSwap(depth){
@@ -207,8 +206,6 @@ function UpdateSwap(depth){
     
     SaveData();
 }
-
-
 //Shifting array for Marker and Level Cycles
 //Moving the length of the array minus 1 is the same as 1 to the left.
 function shiftArrayToRight(arr, places) {
@@ -217,7 +214,6 @@ function shiftArrayToRight(arr, places) {
     }
     return arr;
 }
-
 
 //Send out the info to the channel
 function SendInfo(depth,level){
@@ -281,6 +277,8 @@ function SendInfo(depth,level){
     var embed = new Discord.RichEmbed();
     embed.setTitle("Clockworks")
     embed.addField(depth.name + "'s Status", `${depth.name} recently swapped to ${current}  ${icon}`)
+    Log(`${depth.name} is now on ${current}  ${icon}`);
+    
     embed.addBlankField();
 
     embed.addField("Marker Cycle: ", `${marker_cycle}`)
@@ -307,34 +305,6 @@ function SendInfo(depth,level){
         });
     } 
 }
-
-
-//Get the icon for this.
-function GetIcon(arr){
-    var icons = Array.from(arr);
-    for(var i = 0; i < arr.length; i++){
-        for (var key in images){
-            if(icons[i] === key){
-                icons[i] = images[key];
-            }
-        }
-    }
-    return icons;
-}
-
-//Get Level Names
-function GetNames(arr){
-    var names = Array.from(arr);
-    for(var i = 0; i < arr.length; i++){
-        for (var key in level_names){
-            if(names[i] === key){
-                names[i] = level_names[key];
-            }
-        }
-    }
-    return names;
-}
-
 
 //Getting the future level
 function GetFuture(depth){
@@ -444,7 +414,6 @@ function GetFuture(depth){
     }
     return level;
 }
-
 //Getting the current level
 function GetLevel(depth){
     //What position the marker is in.
@@ -501,7 +470,30 @@ function GetLevel(depth){
     }
     return level;
 }
-
+//Get the icon for this.
+function GetIcon(arr){
+    var icons = Array.from(arr);
+    for(var i = 0; i < arr.length; i++){
+        for (var key in images){
+            if(icons[i] === key){
+                icons[i] = images[key];
+            }
+        }
+    }
+    return icons;
+}
+//Get Level Names
+function GetNames(arr){
+    var names = Array.from(arr);
+    for(var i = 0; i < arr.length; i++){
+        for (var key in level_names){
+            if(names[i] === key){
+                names[i] = level_names[key];
+            }
+        }
+    }
+    return names;
+}
 
 //Validating and Saving Data
 function Validate(json){
@@ -525,6 +517,11 @@ function SaveData(){
             if (err) console.error(err);
         })   
     }
+}
+//Logging Updates
+function Log(msg){
+    var mychannel = bot.channels.get("603378159060123712");
+    mychannel.send(msg);
 }
 
 bot.on('ready', () => {
