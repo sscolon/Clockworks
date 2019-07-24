@@ -155,7 +155,7 @@
         "marker_index":0
     },"Aurora Isles":{
         "name":"Aurora Isles",
-        "levels":["aurora","aurora 2","aurora 3","aurora 4"],
+        "levels":["jelly1","jelly2","garden","stone"],
         "direction":"left",
         "icon":"https://i.imgur.com/dcyv6uU.png",
     
