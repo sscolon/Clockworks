@@ -1,12 +1,18 @@
 const Discord = require('discord.js');
+
+//Imaging
+const Canvas = require('canvas');
+
 const bot = new Discord.Client();
 const http = require('http');
 const express = require('express');
 const app = express();
+const fs = require('fs');
 const prefix = "/";
 
+
 app.get("/", (request, response) => {
-  ////console.log(Date.now() + " Ping Received");
+  console.log(Date.now() + " Ping Received");
   response.sendStatus(200);
 });
 app.listen(process.env.PORT);
@@ -14,580 +20,711 @@ setInterval(() => {
   http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`);
 }, 280000);
 
-const fs = require('fs');
-var server;
-var user;
 
-try{
-    server = JSON.parse(fs.readFileSync('.data/server.json','utf8')); //Server Information
-    user = JSON.parse(fs.readFileSync('.data/user.json','utf8')); // Player Stats
-} catch (e){
-    server = {};
-    user = {};
-}
+let spawn_table = JSON.parse(fs.readFileSync('configurations/spawn_table.json','utf8')); // Configuration for rng things.
+let manage = JSON.parse(fs.readFileSync('configurations/management.json','utf8')); // Configuration for other things.
+let glyph = JSON.parse(fs.readFileSync('configurations/shop.json','utf8'));
+let data = JSON.parse(fs.readFileSync('.data/data.json','utf8')); //Data that needs to be stored.
+var conditions = require("./conditions.js");
 
-let images = JSON.parse(fs.readFileSync('config/image.json','utf8'));
-let level_names = JSON.parse(fs.readFileSync('config/names.json','utf8'));
-let rotations = JSON.parse(fs.readFileSync('config/depth.json','utf8'));
-
-setInterval(function() {
-    Update();
-}, 5000);
-
-//Check for updates, this is called every 5 seconds.
-function Update(){
-    ////console.log("Updating");
-    for(var key in rotations){
-        if(rotations[key].name){
-            Instance(key);
-        } 
-    }
-    for(var key in server.depths){
-        ////console.log(key);
-        UpdateSwap(server.depths[key]);
-        
-    }
-}
-//Instance a new depth for cycling.
-function Instance(depth){
-    if(!server.depths[rotations[depth].name]){
-        server.depths[rotations[depth].name] = {};
-        server.depths[rotations[depth].name] = rotations[depth];
-        SaveData();
-        //console.log("New Depth!");
-    }
-}
-
-//#region Date Stuff
-//Get the date that that depth was recorded
-function SetDate(depth, marker = false){
-    var initialize = new Date();
-
-    //Sets a specific date, we will add offsets to this date in order to produce a swap time.
-    if(marker === false){
-        initialize.setMonth(depth.month);
-        initialize.setDate(depth.day);
-        initialize.setHours(depth.hour);
-        initialize.setMinutes(depth.minute);
-        initialize.setSeconds(depth.second);
-    
-    } else {
-        initialize.setMonth(depth.month);
-        initialize.setDate(depth.day);
-        initialize.setHours(depth.marker_hour);
-        initialize.setMinutes(depth.marker_minute);
-        initialize.setSeconds(depth.marker_second);
-
-    }
-    
-   // //console.log("Init " + initialize);
-    return initialize;
-}
-//Get today's date, this was for testing purposes
-function GetDate(seconds = 0, timezone = 0){
- 
-    var date = new Date();
-    date.setSeconds(date.getSeconds() + seconds);
-
-    var est = date.getTime() +(date.getTimezoneOffset() * 60000)
-    var newDate =  new Date(est + (3600000*timezone));
-
-    return newDate.toLocaleString();
-
-}
-//Offset Date
-function OffsetDate(init, offset){
-    var nextDate = new Date(init);
-    nextDate.setSeconds(init.getSeconds() + offset);
-    return nextDate;
-}
-//#endregion
-
-function WithinBounds(arr,val){
-    if(val >= arr.length){
-        val = 0;
-    }
-    if(val < 0){
-        val = arr.length - 1;
-    }
-    var check = val;
-    return check;
-}
-//Update the swap of a Depth
-function UpdateSwap(depth){
-    //Store this data in another variable to make the code look better.
-    var myDepth = server.depths[depth.name];
-
-    if(!myDepth.ready) {
-        //Get the inital swap of this depth
-        var init = SetDate(depth); 
-        var init_marker = SetDate(depth,true);
-
-
-        //Create new dates from the instances,
-        myDepth.next = new Date(init);
-        myDepth.marked = new Date(init_marker);
-
-        myDepth.ready = true;
-
-        //Swap out the level names for the actual icons
-        myDepth.icons = GetIcon(myDepth.levels);
-        myDepth.names = GetNames(myDepth.levels);
-
-        //Initial Offsets
-        //We don't want it to swap levels when initializing, so we offset right here.
-        myDepth.next = OffsetDate(myDepth.next,depth.rotation[myDepth.rotation_index]);
-        myDepth.marked = OffsetDate(myDepth.marked,depth.markerrotation[myDepth.marker_index])
-    }
-
-   
-    //While today is in the future, keep cycling the level.
-    var currentDate = new Date();
-    myDepth.next = new Date(myDepth.next);
-    myDepth.marked = new Date(myDepth.marked);
-
-    var updated = false;
-  
-    var left = myDepth.levels.length - 1;
-    var right = 1;
-
-    while(currentDate >= myDepth.next){
-        //Swap Left or Right
-        switch(myDepth.direction){
-            case 'left':
-                myDepth.levels = shiftArrayToRight(myDepth.levels,left); 
-            break;
-            case 'right':
-                myDepth.levels = shiftArrayToRight(myDepth.levels,right); 
-            break;
-        }
-
-        //Offset Date
-        myDepth.next = OffsetDate(myDepth.next,depth.rotation[myDepth.rotation_index]);
-        //Next in the array
-        myDepth.rotation_index += 1;
-        //Making sure the number is within the array;
-        myDepth.rotation_index = WithinBounds(depth.rotation,myDepth.rotation_index);
-        
-        updated = true;
-    }
-
-    //While today is in the future, keep cycling the marker
-    while(currentDate >= myDepth.marked){
-        //Offset the date by the rotation time
-        myDepth.marked = OffsetDate(myDepth.marked,depth.markerrotation[myDepth.marker_index])
-  
-        //Move to the next in the array
-        myDepth.selection += 1;
-        myDepth.marker_index += 1;
-        
-             //Make sure the index doesn't go further than the array.
-        myDepth.selection = WithinBounds(depth.marker,myDepth.selection);
-        myDepth.marker_index = WithinBounds(depth.markerrotation,myDepth.marker_index);
-
-        updated = true;
-    }
-    
-    if(updated){
-        //console.log(server.depths[depth.name].levels);
-        var level = GetLevel(myDepth);
-        SendInfo(myDepth,level);
-    }
-
-    server.depths[depth.name] = myDepth;
-    SaveData();
-}
-//Shifting array for Marker and Level Cycles
-//Moving the length of the array minus 1 is the same as 1 to the left.
-function shiftArrayToRight(arr, places) {
-    for (var i = 0; i < places; i++) {
-        arr.unshift(arr.pop());
-    }
-    return arr;
-}
-
-//Send out the info to the channel
-function SendInfo(depth,level){
-   
-    var upcoming = GetFuture(depth);
-    var channel = bot.channels.get("602110386967150600");
-
-
-    depth.icons = GetIcon(depth.levels);
-    depth.markers = GetIcon(depth.marker);
-    //Combine the arrows and emojis to create a nice looking view of that depth.
-    var cycle = "";
-    for(var i = 0; i < depth.icons.length; i++){
-        cycle += depth.icons[i];
-        cycle += " ";
-        if(i + 1 < depth.icons.length){
-            cycle += images[depth.direction];
-        }
-    }
-
-    var marker_cycle = "";
-    var marker_pos = depth.markers[depth.selection];
-
-    for(var j = 0; j < depth.markers.length; j++){
-
-        if(marker_pos === depth.markers[j]){
-            switch(marker_pos){
-                case '<:numeral_1:602902321256595476>':
-                    marker_pos = "<:numeral_1_selected:602911430533971997>";
-                break;
-                case '<:numeral_2:602902321109663745>':
-                    marker_pos = "<:numeral_2_selected:602911431482015754>";
-                break;
-                case '<:numeral_3:602902321042817035>':
-                    marker_pos = "<:numeral_3_selected:602911431519764494>";
-                break;
-                case '<:numeral_4:602902321277435905>':
-                    marker_pos = "<:numeral_4_selected:602911431507312650>";
-                break;
-                case '<:numeral_5:602902321760043034>':
-                    marker_pos = "<:numeral_5_selected:602911431452786689>"
-                break;
-            }
-
-            marker_cycle += marker_pos;
-        } else {
-            marker_cycle += depth.markers[j];
-        }
-
-      
-        marker_cycle += " ";
-        if(j + 1 < depth.markers.length){
-            marker_cycle += images["right"];
-        }
-    }
-
-    console.log(level);
-    var current = level_names[level];
-    var icon = images[level];
-
-    var embed = new Discord.RichEmbed();
-    embed.setTitle("Clockworks")
-    embed.addField(depth.name + "'s Status", `${depth.name} recently swapped to ${current}  ${icon}`)
-    Log(`${depth.name} is now on ${current}  ${icon}`);
-    
-    embed.addBlankField();
-
-    embed.addField("Marker Cycle: ", `${marker_cycle}`)
-    embed.addField("Level Cycle ", `${cycle}`)
-    
-    embed.addField("Next Level in Queue: ", `${level_names[upcoming]}  ${images[upcoming]}`)
-    embed.addBlankField();
-    embed.addField("Next Marker Swap: ",  depth.marked)
-    embed.addField("Next Level Swap:", depth.next)
-    
-
-    embed.setThumbnail(depth.icon);
-
-    //Try to edit previous message, if you can't do that, create a new one.
-    try{
-        channel.fetchMessage(depth.id).then (levelset => {
-            levelset.edit(embed);
-        })
-    } catch(e){
-        
-        //console.log("Instancing New Depth")
-        channel.send(embed).then (sentEmbed => {
-            depth.id = sentEmbed.id;
-        });
-    } 
-}
-
-//Getting the future level
-function GetFuture(depth){
-    var temp = depth.selection;
-    var first = false;
-    var same = false;
-    //console.log("Selection " + temp);
-
-    //Checking if the marker will rotate first.
-    if(depth.marked < depth.next){
-        temp = depth.selection + 1;
-        if(temp >= depth.marker.length){
-            temp = 0;
-        }
-        console.log("marker rotating first");
-        first = true;
-    }
-
-    //Debugging
-    //console.log(depth.name + "  " + depth.marked);
-    //console.log(depth.name + "  " + depth.next);
-    //console.log(depth.name + " subtraction " + (depth.marked - depth.next));
-
-    var diff = depth.marked - depth.next;
-
-    //If they're at the same time, we want both to happen.
-    if(diff === 0){
-        temp = depth.selection + 1;
-        if(temp >= depth.marker.length){
-            temp = 0;
-        }
-        console.log("both will happen!")
-        same = true;
-    }
-    
-    //New Marker Position
-    var pos = depth.marker[temp];
-    //console.log(temp);
-    //console.log("Future Position " + pos);
-    var future = Array.from(depth.levels);
-  
-    //Depth rotating first
-    if(first === false || same === true){
-        
-        switch(depth.direction){
-            case 'left':
-                console.log(depth.name + " will shift to the left");
-                future = shiftArrayToRight(future,depth.levels.length - 1);
-            break;
-            case 'right':
-                console.log(depth.name + " will shift to the right");
-                future = shiftArrayToRight(future,1);
-            break;
-        }
-    }
-
-    //Debugging Purposes
-    //console.log("Future Cycle : " + future);
-    var level;
-
-    switch(pos){
-        case 'two left':
-            level = future[0];
-        break;
-        case 'two right':
-            level = future[1];
-        break;
-        case 'three left':
-            level = future[0];
-        break;
-        case 'three right':
-            level = future[future.length - 1];
-        break;
-        case 'three middle':
-            level = future[1];
-        break;
-        case 'five middle':
-            level = future[2];
-        break;
-        case 'four middle left':
-            level = future[1];
-        break;
-        case 'four middle right':
-            level = future[2];
-        break;
-        case 'four right':
-            level =  future[future.length - 1];
-        break;
-        case 'four left':
-            level = future[0];
-        break;
-        case 'five right':
-            level =  future[future.length - 1];
-        break;
-        case 'five left':
-            level = future[0];
-        break;
-        case 'five middle':
-            level = future[2];
-        break;
-        case 'five middle left':
-            level = future[1];
-        break;
-        case 'five middle right':
-            level = future[3];
-        break;
-    }
-    return level;
-}
-//Getting the current level
-function GetLevel(depth){
-    //What position the marker is in.
-    var pos = depth.marker[depth.selection];
-    console.log(pos);
-    var level;
-    //console.log("Get Level " + depth.levels);
-    switch(pos){
-        case 'two left':
-            level = depth.levels[0];
-        break;
-        case 'two right':
-            level = depth.levels[1];
-        break;
-        case 'three left':
-            level = depth.levels[0];
-        break;
-        case 'three right':
-            level = depth.levels[depth.levels.length - 1];
-        break;
-        case 'three middle':
-            level = depth.levels[1];
-        break;
-        case 'five middle':
-            level = depth.levels[2];
-        break;
-        case 'four middle left':
-            level = depth.levels[1];
-        break;
-        case 'four middle right':
-            level = depth.levels[2];
-        break;
-        case 'four right':
-            level =  depth.levels[depth.levels.length - 1];
-        break;
-        case 'four left':
-            level = depth.levels[0];
-        break;
-        case 'five right':
-            level =  depth.levels[depth.levels.length - 1];
-        break;
-        case 'five left':
-            level = depth.levels[0];
-        break;
-        case 'five middle':
-            level = depth.levels[2];
-        break;
-        case 'five middle left':
-            level = depth.levels[1];
-        break;
-        case 'five middle right':
-            level = depth.levels[3];
-        break;
-    }
-    return level;
-}
-//Get the icon for this.
-function GetIcon(arr){
-    var icons = Array.from(arr);
-    for(var i = 0; i < arr.length; i++){
-        for (var key in images){
-            if(icons[i] === key){
-                icons[i] = images[key];
-            }
-        }
-    }
-    return icons;
-}
-//Get Level Names
-function GetNames(arr){
-    var names = Array.from(arr);
-    for(var i = 0; i < arr.length; i++){
-        for (var key in level_names){
-            if(names[i] === key){
-                names[i] = level_names[key];
-            }
-        }
-    }
-    return names;
-}
-
-//Validating and Saving Data
+//Saving Data, Make sure the json is good before saving it.
 function Validate(json){
     try {
-    //Stringify the json and then attempt to Parse it.  If the parse fails we won't save the data and should neglect all changes made.
-        var check = JSON.stringify(json);
-        JSON.parse(check);
+        var save = JSON.stringify(json);
+        var load = JSON.parse(save);
         return true;
-    } catch (e) {
+    } catch (e){
+        console.log("Invalid Data, will not save");
+        console.log(e);
         return false;
     }
 }
 function SaveData(){
-    if(Validate(user)){
-        fs.writeFile('.data/user.json', JSON.stringify(user,null,4), (err) =>{
+    //SaveData here
+    if(Validate(data)){
+        fs.writeFile('.data/data.json', JSON.stringify(data,null,2), (err) =>{
             if (err) console.error(err);
-        })   
-    } 
-    if(Validate(server)){
-        fs.writeFile('.data/server.json', JSON.stringify(server,null,4), (err) =>{
-            if (err) console.error(err);
-        })   
+        })
     }
 }
-//Logging Updates
-function Log(msg){
-    if(server.log){
-        var mychannel = bot.channels.get("603378159060123712");
-        mychannel.send(msg);
+
+//Send information to channels
+function CreateAnnouncement(announcement,id = 0){
+    //Get the different channels
+    switch(id){
+        case 0:
+            id = "595970390250225664";
+        break;
+        case 1:
+            id = "595970413528481792";
+        break;
+        case 2:
+            id = "596021883095482378";
+        break;
+        case 3:
+            id = "596021725620207682";
+        break;
     }
+    const news = new Discord.RichEmbed()
+    news.setTitle("Important Announcement")
+    news.addField("News", announcement)
+    news.setFooter("Read all about it!")
+    news.setThumbnail(manage.announcement)
+    var channel = bot.channels.get(id);
+    channel.send(news);
+}
+
+//Raffle
+function Raffle(){
+    var players = [];
+    var weights = [];
+    for(var key in data){
+        players.push(data[key].name);
+        weights.push(data[key].weight);  
+    }
+
+    const raffle = new Discord.RichEmbed()
+    raffle.setTitle("Raffle!")
+    raffle.setThumbnail(manage.announcement)
+    for(var i = 0 ; i < manage.prize.length; i++){
+        //Roll the winner
+        var winner = Roll(players,weights);
+        raffle.addField("The winner for the " + manage.prize[i] + " is... " + winner + " !", "Congratulations!")
+    }
+    raffle.addField("Your prizes will arrive via mail shortly!","Enjoy!")
+    var channel = bot.channels.get("574793843963199506");
+    channel.send(raffle);
+    
+}
+function Roll(loot, weights){
+    var top = 0;
+    var total = 0;
+    for(var j = 0; j < weights.length; j++){
+        total+=weights[j];
+    }
+    var rand = Math.floor(Math.random() * total);
+    for(var i = 0; i < loot.length; i++){
+        top+=weights[i]; 
+        if(rand <= top){ 
+            return loot[i];                         
+        }                 
+    }   
+}
+
+//Find Player
+function FindPlayer(args){
+    var person = "";
+    for (var i = 1; i < args.length; i++) {
+        if(data[person]){
+                break;
+        }
+        if(args[i + 1] != args[args.length]){
+                person += args[i].toString();
+        }
+        if (args[i + 1] != null && args[i + 1] != args[args.length - 1]) {
+                person += " ";
+        }
+    }
+    return person;
+}
+
+//Spawn Table
+function Spawn(drop_table){
+    var top = 0;
+    var total = 0;
+    //Weighted Randomness
+    
+    //Get the sum of all weights
+    for(var key in drop_table){
+        total+=drop_table[key].weight; 
+    }
+  
+    //Generate a random number
+    var rand = Math.floor(Math.random() * total);
+
+    //For each key in the drop table, see if the random number is less than the top.
+    //If so, that's your drop.
+    for(var key in drop_table){
+        top+=drop_table[key].weight; 
+        if(rand <= top){ 
+            //Return the name of that entry.
+            return key;                         
+        }                 
+    }   
+}
+
+//Addpoints to the player
+function AddPoints(player,amount){
+    data[player].points += amount;
+    if(data[player].points <= 0){
+        data[player].points = 0;
+    }
+}
+function AddCoins(player,amount){
+    data[player].coins += amount;
+    if(data[player].coins <= 0){
+        data[player].coins = 0;
+    }
+}
+
+//Roll the Slots
+var limit = 10;
+function Slots(player,amount,channel){
+    const embed = new Discord.RichEmbed();
+    embed.setTitle(data[player].name + " is Spinning Slots!")
+    embed.setThumbnail(data[player].art);
+  
+    if(conditions.GreaterThan(data[player].coins,amount)){
+        //Points Configuration and Set up Result
+        var points = spawn_table["POINTS"];
+        var result = {};
+
+        //Roll the loot
+        for(var i = 0; i < amount; i++){
+            var drop = Spawn(spawn_table["CASINO"]);
+            AddPoints(player,points[drop].amount);
+            result[i] = {};
+            result[i].amount = points[drop].amount;
+            result[i].name = points[drop].name;
+            result[i].image = points[drop].image;
+        }
+       
+        //Substract the Coins
+        AddCoins(player,-amount);
+       
+        Slots_Result(player,result,amount,channel);
+
+    }
+}
+async function Slots_Result(player,result,amount,channel){
+    const canvas = Canvas.createCanvas(400, 100 + (amount * 80));
+    const ctx = canvas.getContext('2d');
+    const background = await Canvas.loadImage(glyph.background);
+    const border = await Canvas.loadImage(glyph.border);
+    const backing = await Canvas.loadImage(glyph.token_holder);
+    const tokens =  await Canvas.loadImage(glyph.coins);
+
+    ctx.drawImage(background,0, 0, canvas.width, canvas.height);
+   
+   
+    ctx.font = "600 30px Arial";
+    ctx.lineWidth = 8;
+
+    ctx.textAlign = "center";
+    ctx.strokeStyle = "black";
+    ctx.strokeText(data[player].name + "'s Results",200,50);
+
+    ctx.fillStyle = "#FCDB00";
+    ctx.fillText(data[player].name + "'s Results",200,50);
+
+    var offset = 60;
+    var distance = 70;
+    for(var i = 0; i < amount; i++ ){
+        var icon = await Canvas.loadImage(result[i].image);
+        ctx.drawImage(icon , 25 , offset + (i * distance), 50, 50);
+
+        ctx.lineWidth = 8;
+        ctx.textAlign = "start";
+        ctx.strokeStyle = "black";
+        ctx.strokeText(result[i].amount,75,(offset + 30) + (i * distance));
+    
+        ctx.fillStyle = "#FCDB00";
+        ctx.fillText(result[i].amount,75,(offset + 30) + (i * distance));
+    }
+
+
+    ctx.drawImage(border,0, 0, canvas.width, canvas.height);
+
+    //Tokens Remaining
+   
+    ctx.drawImage(backing,0,canvas.height - 80,140,80)
+    ctx.drawImage(tokens, 24, canvas.height - 60,40,40);
+
+    ctx.font = "600 20px Arial";
+    ctx.fillText(data[player].coins, offset + 40, canvas.height - 5);
+
+    const attachment = new Discord.Attachment(canvas.toBuffer(), 'slots.png');
+
+    channel.send(attachment);
+}
+
+function InstancePlayer(player){
+    data[player] = {};
+    data[player].weight = 0;
+    data[player].points = 0;
+    data[player].coins = 0;
+    console.log("New data");
+}
+
+function PlayerBase(isAdmin = false){
+    const players = new Discord.RichEmbed()
+    players.setTitle("Current Playerbase")
+
+    var base = [];
+
+    for(var key in data){          
+        try{
+            if(data[key].name != undefined){
+                if(!isAdmin){
+                    base.push(data[key].name);
+                } else {
+                    base.push(data[key].name + " " + data[key].points + " points.");
+                }
+            }  
+        } catch(e) {
+            console.log(e);
+            console.log("Not a player");
+        }       
+    }
+
+    players.addField("Interesting:",base);
+
+    return players;
+}
+
+//Viewing the player bank
+async function Bank(icon,player,channel,rank){
+    const canvas = Canvas.createCanvas(400, 200);
+    const ctx = canvas.getContext('2d');
+    const background = await Canvas.loadImage(glyph.background);
+    const nameplate = await Canvas.loadImage(glyph.nameplate); 
+    const coin_icon = await Canvas.loadImage(glyph.coins);
+    const point_icon = await Canvas.loadImage(glyph.points);
+    const player_icon = await Canvas.loadImage(icon);
+    const border = await Canvas.loadImage(glyph.border); 
+
+    ctx.drawImage(background,0, 0, canvas.width, canvas.height);
+    ctx.drawImage(player_icon, 275,50,100,100);
+    ctx.drawImage(nameplate, 240, 0, 175, 50);
+
+    ctx.drawImage(coin_icon, 5,135,50,50);
+    ctx.drawImage(point_icon, 5,90,50,50);
+    ctx.drawImage(border,0,0,canvas.width,canvas.height);
+
+    var coins = data[player].coins.toString();
+    var points = data[player].points.toString();
+
+    ctx.font = "600 15px Arial";
+
+    //Name
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#FCDB00";
+    ctx.fillText(data[player].name,325,25);
+
+    ctx.font = "600 20px Arial";
+
+    //Points
+    ctx.lineWidth = 8;
+    ctx.textAlign = "start";
+    ctx.strokeStyle = "black";
+    ctx.strokeText("Points " + points,60,125);
+    
+ 
+    ctx.fillStyle = "#FCDB00";
+    ctx.fillText("Points " + points,60,125);
+
+    //Coins
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = "black";
+    ctx.strokeText("Tokens " + coins,60,175);
+    
+    ctx.textAlign = "start";
+    ctx.fillStyle = "#FCDB00";
+    ctx.fillText("Tokens " + coins,60,175);
+
+    //Rank
+    ctx.textAlign = "center";
+    ctx.strokeStyle = "black";
+    ctx.strokeText(rank,325,160);
+
+    ctx.fillStyle = "#A60EE6";
+    ctx.fillText(rank,325,160);
+
+    const attachment = new Discord.Attachment(canvas.toBuffer(), 'player_stats.png');
+
+    channel.send(attachment); 
+}
+//Create Listing on the Glyph Shop
+async function CreateImage(image,name,price){
+    var channel = bot.channels.get("596021725620207682");
+	const canvas = Canvas.createCanvas(400, 400);
+    const ctx = canvas.getContext('2d');
+    
+    var newName = name.split("_");
+    var combinedName = "";
+    for(var i = 0; i < newName.length; i++){
+        combinedName += newName[i];
+        combinedName += " ";
+    }
+	// Since the image takes time to load, you should await it
+    const background = await Canvas.loadImage(glyph.background);
+
+    try{
+        const test = await Canvas.loadImage(image);
+    } catch(e){
+        channel.send("Invalid Image");
+        return;
+    }
+
+    //Create Image
+    const item = await Canvas.loadImage(image);
+    const fiend = await Canvas.loadImage(glyph.icon_fiend);
+    const top_border = await Canvas.loadImage(glyph.border_top);
+    const bottom_border = await Canvas.loadImage(glyph.border_bottom);
+
+    // This uses the canvas dimensions to stretch the image onto the entire canvas
+    ctx.drawImage(background, 1.5, 9, canvas.width - 2, canvas.height - 30);
+    ctx.drawImage(top_border,0 , 0, canvas.width, 50);
+    ctx.drawImage(bottom_border, 0, 350, canvas.width,50);
+
+    //Draw this in the center
+    ctx.drawImage(item, 67, 67, canvas.width/1.5, canvas.height/1.5);
+    ctx.drawImage(fiend, 50, 58, 50,50);
+    
+    ctx.font = "600 30px Arial";
+
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = "black";
+    ctx.strokeText(combinedName,25,350);
+    
+    ctx.textAlign = "start";
+    ctx.fillStyle = "#FCDB00";
+    ctx.fillText(combinedName,25,350);
+    
+    ctx.font = "600 50px Arial"
+    ctx.textAlign = "start";
+    ctx.fillStyle = "#A60EE6";
+    ctx.fillText(price,100,100);
+
+    ctx.font = "600 30px Arial"
+    ctx.fillStyle = "#FFD9C4";
+    ctx.textAlign = "center";
+    ctx.fillText("Ends Anytime!",200,385);
+
+	// Use helpful Attachment class structure to process the file for you
+	const attachment = new Discord.Attachment(canvas.toBuffer(), 'newItem.png');
+    channel.send(attachment);
+}
+
+//Get the JSONs currently on disk
+function Log(channel,json){
+    const attachment = new Discord.Attachment(json);
+    channel.send(attachment);
+}
+function CreateTXT(){
+    var stream = fs.createWriteStream("log.txt");
+    stream.once('open', function(fd) {
+        stream.write("My first row\n");
+        stream.end();
+    })
 }
 
 bot.on('ready', () => {
-    console.log("Ready to go!");
-})
 
-//This is ran everytime a message is edited
+    console.log("Raring to go!");
+})
 bot.on('messageUpdate', message =>{
     SaveData();
- })
-
- //This is ran every message
-bot.on('message', message=> { 
+})
+bot.on('message', message=> {
     if(message.channel.type === "dm"){
         return;
     } 
-    
-    let gm = message.guild.roles.find(x => x.name === "GameMaster").id;
-    var powerful = message.member.roles.has(gm);
 
-    let args = message.content.substring(prefix.length).split(" ");
-
-    //Commands - Disabled
-    if(message.content.startsWith(prefix)){
-        //Arguments
-        if(powerful){
-            switch(args[0]){
-                case 'clear':
-                    var mychannel = bot.channels.get("602110386967150600");
-                    for(var key in server.depths){
-                        try {
-                            mychannel.fetchMessage(server.depths[key].id).then (sentEmbed => {
-                                sentEmbed.delete();
-                            });
-                        } catch(e){
-                            console.log("message doesn't exist");
-                        }
-                        
-                    }
-                    server = {};
-                    server.depths = {};
-                    server.log = false;
-                    SaveData();
-                    Update();
-                    //console.log("Data Cleared");
-                break;
-                case 'update':
-                    Update();
-                break;
-                case 'date':
-                    message.channel.send(GetDate());
-                break;
-                case 'enable':
-                    switch (args[1]){
-                        case 'log':
-                            server.log = !server.log;
-                            message.reply("Gate Log was set to " + server.log);
-                        break;
-                    }           
-                break;
-            }
-        }
-        //Player Commands
-        switch(args[0]){
-            case 'role':
-               switch(args[1]){
-                    
-               }
-            break; 
-        }
-        
+    let player = message.author.id;
+   
+    //Incase we need to clear data
+    if(!data){
+        data = {};
+    }
+    if(!data[player].art){
+        data[player].art = message.author.avatarURL;
+    }
+    //Instancing Player Data
+    if(!data[player]){
+        InstancePlayer(player);
+        data[player].name = message.author.username;
+        data[player].art = message.author.avatarURL;
     }
 
+    if(!data[player].coins){
+        data[player].coins = 0;
+    }
+    if(!data.jackpot){
+        data.jackpot = 0;
+    }
+
+    //Arguments
+    let args = message.content.substring(prefix.length).split(" ");
+    //Admin Powers
+    var admin;
+    if(message.channel.type === "text"){
+        admin = message.guild.roles.find(role => role.name === "Pit Boss").id;
+    }  
+    
+    switch(args[0]){
+        //Check who has data
+        case 'player':
+            var play = PlayerBase(admin);
+            message.author.send(play);
+            //message.delete();
+        break;
+        case 'log':
+            switch (args[1]) {
+                case 'data':
+                    Log(message.channel,'.data/data.json');
+                break;
+                case 'spawn_table':
+                    Log(message.channel,'configurations/spawn_table.json');
+                break;
+                case 'management':
+                    Log(message.channel,'configurations/management.json');
+                break;
+                case 'shop':
+                    Log(message.channel,'configurations/shop.json');
+                break;
+            }
+        break;
+        //Check the loot tables!
+        case 'slots':
+            const check = new Discord.RichEmbed()
+            check.setTitle("Prize Pool")
+            var pool = [];
+
+            pool.push("10 Points  -  ~53%")
+            pool.push("30 Points  -  ~23%")
+            pool.push("50 Points  -  ~11%")
+            pool.push("200 Points  -  ~6%")
+            pool.push("800 Points  -  ~2%")
+            pool.push("-100 Points(Whammie) -  ~2%")
+            pool.push("2000 Points(Jackpot) -  ~1%")
+
+            check.addField("Good Luck:",pool)
+            message.channel.send(check);
+        break;
+        case 'play':
+            //Play various arcade games!
+            if(!args[1]){
+                message.author.send("You forgot to select something to play: You can pick: ")
+                return;
+            }
+
+            switch(args[1]){
+                case "slots":
+                    if(args[2]){
+                        try {
+                            var amount = parseInt(args[2]);
+                            
+                            if(amount > limit){
+                                message.reply("Maximum Number of spins at once is " + limit);
+                                return;
+                            }
+
+                            Slots(player,amount,message.channel);
+
+                        } catch (e){
+                            console.log(e);
+                            message.reply("Sorry, please try again!");
+                        }
+                    } else {
+                        //Default to 1 if no spin limit is specified.
+                        Slots(player,1,message.channel);
+                    }
+                break;
+            }
+        break;
+       //Add Coins
+        case 'addcoin':
+                if(!message.member.roles.has(admin)){
+                    message.author.send("You do not have the necessary roles.");
+                    return;
+                }
+                if(!args[1]){
+                    message.author.send("Please specify someone to add points to.");
+                    return;
+                }  
+                var person = FindPlayer(args);
+                var amount = parseFloat(args[args.length - 1].toString());
+                for (var key in data){
+                    if(data[key].name === person){
+                        try {
+                            AddCoins(key,amount);
+                        } catch(e) {
+                            console.log("Failed to give points, Syntax: /add [player] [points]");
+                        }
+                        message.author.send(amount + " coins Added to " + data[key].name);
+                    } 
+                }        
+            //message.delete();
+        break;
+        //Add Points
+        case 'add':
+                if(!message.member.roles.has(admin)){
+                    message.author.send("You do not have the necessary roles.");
+                    return;
+                }
+                if(!args[1]){
+                    message.author.send("Please specify someone to add points to.");
+                    return;
+                }  
+                var person = FindPlayer(args);
+                var amount = parseFloat(args[args.length - 1].toString());
+                for (var key in data){
+                    if(data[key].name === person){
+                        try {
+                            AddPoints(key,amount);
+                        } catch(e) {
+                            console.log("Failed to give points, Syntax: /add [player] [points]");
+                        }
+                        message.author.send(amount + " points Added to " + data[key].name);
+                    } 
+                }        
+            //message.delete();
+        break;
+
+        //Check your points
+        case 'points':
+            var rank = "Gorgo";
+            if(message.member.roles.find(r => r.name === "Devilite")){
+                rank = "Devilite";
+            } else if (message.member.roles.find(r => r.name === "Devilite Overtimer ")){
+                rank = "Devilite Overtimer";
+            } else if (message.member.roles.find(r => r.name === "Yesman")){
+                rank = "Yesman";
+            } else if (message.member.roles.find(r => r.name === "Pit Boss")){
+                rank = "Pit Boss";
+            }
+            Bank(message.author.avatarURL,player,message.channel,rank);
+        break;
+
+        //Set a glyph deal
+        case 'glyph':
+            if(args.length < 3){
+                message.reply("Invalid Command Syntax: /glyph [image link] [name] [price]")
+                return;
+            }
+            try{
+                CreateImage(args[1],args[2],args[3].toString(),message.channel);
+                message.delete();
+            } catch(e){
+                console.log(e);
+            }    
+        break;
+        //Announce something
+        case 'announce':
+            if(!message.member.roles.has(admin)){
+                message.author.send("You do not have the necessary roles.").
+                return;
+            }
+            if (!args[1]) {
+                message.author.send("Please specify something to Announce.");
+                return;
+            }
+            var announcement = "";
+            for (var i = 1; i < args.length; i++) {
+                announcement += args[i].toString();
+                if (args[i + 1] != null) {
+                    announcement += " ";
+                }
+            }   
+            CreateAnnouncement(announcement,0);
+        //message.delete();
+        break;   
+
+        //Add Weight to a player
+        case 'raffle':
+            if(!message.member.roles.has(admin)){
+            message.author.send("You do not have the necessary roles.").
+            return;
+            }
+            if(!args[1]){
+            message.author.send("Please specify someone to raffle.");
+            return;
+            }  
+            var person = FindPlayer(args);
+            var amount = parseInt(args[args.length - 1].toString());
+            for (var key in data){
+                if(data[key].name === person){
+                    data[key].weight += amount;
+                    message.author.send("Entries Added");
+                } 
+            }    
+            //message.delete();
+        break;
+
+        //Draw a raffle
+        case 'draw':
+            if(!message.member.roles.has(admin)){
+                message.author.send("You do not have the necessary roles.").
+                return;
+            }
+            Raffle();
+            //message.delete();
+        break;
+
+        //Check people's weights
+        case 'check':
+          var available = [];
+          for(var key in data){
+            available.push(data[key].name + " they have " + data[key].weight + " entries.");
+          }
+          const embed = new Discord.RichEmbed()
+          embed.setTitle("Checking")
+          embed.addField("People",available);
+          message.author.send(embed);
+          //message.delete();
+        break;
+
+        //Info
+        case 'info':
+        if(!message.member.roles.has(admin)){
+              message.author.send("You do not have the necessary roles.").
+              return;
+          }
+         if (!args[1]) {
+                message.author.send("Please specify something to Inform.");
+                return;
+            }
+            var announcement = "";
+            for (var i = 1; i < args.length; i++) {
+                announcement += args[i].toString();
+                if (args[i + 1] != null) {
+                    announcement += " ";
+                }
+            }   
+            CreateAnnouncement(announcement,1);
+        //message.delete();
+        break;
+
+        //Job Channel
+        case 'job':
+          if(!message.member.roles.has(admin)){
+              message.author.send("You do not have the necessary roles.").
+              return;
+          }
+        if (!args[1]) {
+                message.author.send("Please specify something to Inform.");
+                return;
+            }
+            var job = "";
+            for (var i = 1; i < args.length; i++) {
+                job += args[i].toString();
+                if (args[i + 1] != null) {
+                    job += " ";
+                }
+            }   
+            CreateAnnouncement(job,2);
+        //message.delete();
+        break;
+
+        case 'rsrc':
+            message.author.send("https://imgur.com/a/WISJigc");
+        //message.delete();
+        break;
+        
+    }  
+    
+    //All Data we need to keep track of
     SaveData();
 })
 
