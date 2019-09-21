@@ -1,179 +1,27 @@
-{"Emerald Phantom D9":
-    {
-        "name":"Emerald Phantom D9",
-        "levels":["wolver","compound","tunnels"],
-        "direction":"left",
-        "icon":"https://i.imgur.com/1BcvRvb.png",
+{"Dark Clover D1":{
+    "name":"Dark Clover D1",
+    "levels":["drudgery","tunnels","arena"],
+    "direction":"left",
+    "icon":"https://cdn.glitch.com/56c5f866-bb59-4476-ab4a-68387730d7e8%2FDsc.png?1569099546420",
 
-        "year":2019,
-        "month":6,
-        "day":19,
-        "hour":10,
-        "minute":30,
-        "second":0,
-    
-        "marker_hour":19,
-        "marker_minute":10,
-        "marker_second":30,
-        "marker":["three left","three right"],
-        "selection":0,
-    
-        "level":0,
-    
-        "rotation":[900],
-        "rotation_index":0,
-        "markerrotation":[450],
-        "marker_index":0
-    },"Golden Falcon D9":{
-        "name":"Golden Falcon D9",
-        "levels":["shrine 2","shrine"],
-        "direction":"left",
-        "icon":"https://i.imgur.com/E9qvfag.png",
-    
-        "year":2019,
-        "month":6,
-        "day":21,
-        "hour":14,
-        "minute":10,
-        "second":30,
-    
-        "marker_hour":14,
-        "marker_minute":10,
-        "marker_second":30,
-        "marker":["two right","two left"],
-        "selection":0,
-    
-        "level":0,
-    
-        "rotation":[180],
-        "rotation_index":0,
-        "markerrotation":[90],
-        "marker_index":0
-    },"Golden Falcon D10":{
-        "name":"Golden Falcon D10",
-        "levels":["shrine 3","shrine 4"],
-        "direction":"right",
-        "icon":"https://i.imgur.com/E9qvfag.png",
-    
-        "year":2019,
-        "month":6,
-        "day":21,
-        "hour":18,
-        "minute":1,
-        "second":30,
-    
-        "marker_hour":18,
-        "marker_minute":1,
-        "marker_second":30,
-        "marker":["two left","two right"],
-        "selection":0,
-    
-        "level":0,
-    
-        "rotation":[180],
-        "rotation_index":0,
-        "markerrotation":[45,90,45,45,90,45,45,135,45,45,90,45,45,90],
-        "marker_index":0
-    },"Golden Falcon D11":{
-        "name":"Golden Falcon D11",
-        "levels":["arena","arena","compound"],
-        "direction":"left",
-        "icon":"https://i.imgur.com/E9qvfag.png",
-    
-        "year":2019,
-        "month":6,
-        "day":20,
-        "hour":15,
-        "minute":0,
-        "second":0,
-    
-        "marker_hour":15,
-        "marker_minute":15,
-        "marker_second":45,
-        "marker":["three left","three middle","three right"],
-        "selection":0,
-    
-        "level":0,
-    
-        
-        "rotation":[900],
-        "rotation_index":0,
-        "markerrotation":[45,105,105,105,105,105,105,105,105],
-        "marker_index":0
-    },"Golden Falcon D14":{
-        "name":"Golden Falcon D14",
-        "levels":["arena","tunnels","arena"],
-        "direction":"right",
-        "icon":"https://i.imgur.com/E9qvfag.png",
-    
-        "year":2019,
-        "month":6,
-        "day":20,
-        "hour":18,
-        "minute":0,
-        "second":0,
-    
-        "marker":["three left","three right"],
-        "selection":0,
-    
-        "level":0,
-    
-        "marker_hour":18,
-        "marker_minute":0,
-        "marker_second":0,
-        "rotation":[900],
-        "rotation_index":0,
-        "markerrotation":[450],
-        "marker_index":0  
-    },"Golden Falcon D19":{
-        "name":"Golden Falcon D19",
-        "levels":["arena","decon"],
-        "direction":"left",
-        "icon":"https://i.imgur.com/E9qvfag.png",
-    
-        "year":2019,
-        "month":6,
-        "day":20,
-        "hour":18,
-        "minute":52,
-        "second":30,
-    
-        "marker":["two right","two left"],
-        "selection":0,
-    
-        "level":0,
+    "year":2019,
+    "month":8,
+    "day":21,
+    "hour":8,
+    "minute":45,
+    "second":0,
 
-        "marker_hour":18,
-        "marker_minute":52,
-        "marker_second":30,
-        "rotation":[900],
-        "rotation_index":0,
-        "markerrotation":[450],
-        "marker_index":0
-    },"Amber Knight D9":{
-        "name":"Amber Knight D9",
-        "levels":["drudgery","tunnels","compound","compound"],
-        "direction":"right",
-        "icon":"https://i.imgur.com/CDFYEGZ.png",
-    
-        "year":2019,
-        "month":6,
-        "day":20,
-        "hour":16,
-        "minute":7,
-        "second":30,
-    
-        "marker_hour":16,
-        "marker_minute":7,
-        "marker_second":30,
-        "marker":["four left","four right"],
-        "selection":0,
-    
-        "level":0,
-    
-        "rotation":[900],
-        "rotation_index":0,
-        "markerrotation":[450],
-        "marker_index":0
-    }
+    "marker_hour":8,
+    "marker_minute":52,
+    "marker_second":30,
+    "marker":["three left","three right"],
+    "selection":0,
+
+    "level":0,
+
+    "rotation":[900],
+    "rotation_index":0,
+    "markerrotation":[450],
+    "marker_index":0
+}
 }
