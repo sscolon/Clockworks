@@ -19,7 +19,6 @@ var server;
 var user;
 
 try{
-    //Data
     server = JSON.parse(fs.readFileSync('.data/server.json','utf8')); //Server Information
     user = JSON.parse(fs.readFileSync('.data/user.json','utf8')); // Player Stats
 } catch (e){
@@ -27,7 +26,7 @@ try{
     user = {};
 }
 
-//Configs
+let ping = JSON.parse(fs.readFileSync('config/ping.json','utf8'));
 let images = JSON.parse(fs.readFileSync('config/image.json','utf8'));
 let level_names = JSON.parse(fs.readFileSync('config/names.json','utf8'));
 let rotations = JSON.parse(fs.readFileSync('config/depth.json','utf8'));
@@ -263,14 +262,16 @@ function SendInfo(depth,level){
         }
     }
 
-    console.log(level);
+ //   console.log(level);
     var current = level_names[level];
     var icon = images[level];
-
     var embed = new Discord.RichEmbed();
     embed.setTitle("Clockworks")
     embed.addField(depth.name + "'s Status", `${depth.name} recently swapped to ${current}  ${icon}`)
-    Log(`${depth.name} is now on ${current}  ${icon}`);
+    
+    //console.log(server[level]);
+    var rolePing = server[level];
+    Log(`${rolePing} ${depth.name} is now on ${current}  ${icon} `);
     
     embed.addBlankField();
 
@@ -504,18 +505,24 @@ function SaveData(){
         fs.writeFile('.data/user.json', JSON.stringify(user,null,4), (err) =>{
             if (err) console.error(err);
         })   
-    } 
+    } else {
+        console.log("invalid User Json");
+    }
     if(Validate(server)){
         fs.writeFile('.data/server.json', JSON.stringify(server,null,4), (err) =>{
             if (err) console.error(err);
         })   
+    } else {
+        console.log("invalid Server Json");
     }
 }
 //Logging Updates
 function Log(msg){
+    var mychannel = bot.channels.get("603378159060123712");
+    mychannel.send(msg);
     if(server.log){
-        var mychannel = bot.channels.get("603378159060123712");
-        mychannel.send(msg);
+        console.log("Logging Switch!");
+       
     }
 }
 
@@ -533,7 +540,8 @@ bot.on('message', message=> {
     if(message.channel.type === "dm"){
         return;
     } 
-    
+
+
     let gm = message.guild.roles.find(x => x.name === "GameMaster").id;
     var powerful = message.member.roles.has(gm);
 
@@ -556,13 +564,43 @@ bot.on('message', message=> {
                         }
                         
                     }
+
+                   
                     server = {};
                     server.depths = {};
                     server.log = false;
+                    for (var key in ping){
+                        server[key] =  message.guild.roles.find(x => x.name === ping[key]);
+                    }
+
                     SaveData();
                     Update();
                     //console.log("Data Cleared");
                 break;
+                case 'clear log':{
+                    var mychannel = bot.channels.get("602110386967150600");
+                    for(var key in server.depths){
+                        try {
+                            mychannel.fetchMessage(server.depths[key].id).then (sentEmbed => {
+                                sentEmbed.delete();
+                            });
+                        } catch(e){
+                            console.log("message doesn't exist");
+                        }
+                        
+                    }
+                    server = {};
+                    server.depths = {};
+                    server.log = true;
+
+                    for (var key in ping){
+                        server[key] =  message.guild.roles.find(x => x.name === ping[key]);
+                    }
+
+                    SaveData();
+                    Update();
+                    //console.log("Data Cleared");
+                }
                 case 'update':
                     Update();
                 break;
@@ -588,6 +626,11 @@ bot.on('message', message=> {
             break; 
         }
         
+    }
+
+    
+    for (var key in ping){
+        server[key] =  message.guild.roles.find(x => x.name === ping[key]);
     }
 
     SaveData();
