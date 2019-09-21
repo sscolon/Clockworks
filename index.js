@@ -271,7 +271,8 @@ function SendInfo(depth,level){
     
     //console.log(server[level]);
     var rolePing = server[level];
-    Log(`${rolePing} ${depth.name} is now on ${current}  ${icon} `);
+    var gatePing = server[depth.name];
+    Log(`<@&${rolePing}> <@&${gatePing}>`);
     
     embed.addBlankField();
 
@@ -570,7 +571,7 @@ bot.on('message', message=> {
                     server.depths = {};
                     server.log = false;
                     for (var key in ping){
-                        server[key] =  message.guild.roles.find(x => x.name === ping[key]);
+                        server[key] =  message.guild.roles.find(x => x.name === ping[key]).id;
                     }
 
                     SaveData();
@@ -594,7 +595,10 @@ bot.on('message', message=> {
                     server.log = true;
 
                     for (var key in ping){
-                        server[key] =  message.guild.roles.find(x => x.name === ping[key]);
+                        server[key] =  message.guild.roles.find(x => x.name === ping[key]).id;
+                    }
+                    for (var key in depth){
+                        server[key] =  message.guild.roles.find(x => x.name === ping[key]).id;
                     }
 
                     SaveData();
@@ -628,10 +632,6 @@ bot.on('message', message=> {
         
     }
 
-    
-    for (var key in ping){
-        server[key] =  message.guild.roles.find(x => x.name === ping[key]);
-    }
 
     SaveData();
 })

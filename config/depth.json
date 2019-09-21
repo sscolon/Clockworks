@@ -23,5 +23,30 @@
     "rotation_index":0,
     "markerrotation":[450],
     "marker_index":0
+},"Dark Clover D9":{
+    "name":"Dark Clover D9",
+    "levels":["decon","arena"],
+    "direction":"left",
+    "icon":"https://cdn.glitch.com/56c5f866-bb59-4476-ab4a-68387730d7e8%2FDsc.png?1569099546420",
+
+    "year":2019,
+    "month":8,
+    "day":21,
+    "hour":10,
+    "minute":0,
+    "second":0,
+
+    "marker_hour":10,
+    "marker_minute":0,
+    "marker_second":0,
+    "marker":["two left","two right"],
+    "selection":0,
+
+    "level":0,
+
+    "rotation":[900],
+    "rotation_index":0,
+    "markerrotation":[450],
+    "marker_index":0
 }
 }
